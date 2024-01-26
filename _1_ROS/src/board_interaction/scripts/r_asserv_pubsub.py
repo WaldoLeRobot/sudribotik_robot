@@ -40,7 +40,7 @@ def listener():
     rospy.Subscriber("balise/position/plants", ArrayPositionPx, plantPosCallback)
     #rospy.Subscriber("balise/position/pots", ArrayPositionPx, callback)
 
-    # Keeps python from exiting until this node is stopped
+    #Keeps python from exiting until this node is stopped
     # also it permits to this node to listen to new messages on mentioned topics
     # and to run specified callbacks
     rospy.spin()
