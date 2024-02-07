@@ -51,8 +51,10 @@ add_message_files(
   FILES
   PositionPx.msg
   PositionPxWithType.msg
+  PositionPxRectangle.msg
   ArrayPositionPx.msg
   ArrayPositionPxWithType.msg
+  ArrayPositionPxRectangle.msg
   Score.msg
 )
 
