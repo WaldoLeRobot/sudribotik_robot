@@ -12,13 +12,14 @@ FILE_NAME = os.path.basename(FILE_PATH)
 
 sys.path.insert(1, FILE_PATH.split("_1_ROS")[0]) #add parent folder to python path
 from _2_CAMERA import ros_detectAruco, ros_arucoCalc
-from balise_msgs.msg import PositionPx, PositionPxRectangle, ArrayPositionPxRectangle
+from beacon_msgs.msg import PositionPx, PositionPxRectangle, ArrayPositionPxRectangle
 
 
-"""
-Publish elements seen by the camera robot
-"""
+
 def publisher():
+    """
+    Publish elements seen by the camera robot.
+    """
 
     # This node will publish all Aruco seen by the robot
     arucoPos_pub = rospy.Publisher("robot1/position/aruco", ArrayPositionPxRectangle, queue_size=10)
@@ -56,14 +57,15 @@ def publisher():
 
 
 
-"""
-Get message for realtime position of arucos.
-    corners (list)      ->      all detected aruco corners.
-    ids (list)          ->      all detected aruco ids.
-
-Return an ArrayPositionPxRectangle msg.
-"""
 def getPositionArucoMsg():
+    """
+    Get message for realtime position of arucos.
+        corners (list)      ->      all detected aruco corners.
+        ids (list)          ->      all detected aruco ids.
+
+    Return an ArrayPositionPxRectangle msg.
+    """
+
     msg = [] #create msg
     aruco_msg = PositionPxRectangle()
     corner = PositionPx() #all corners will use the same instance of PositionPx
@@ -95,6 +97,8 @@ def getPositionArucoMsg():
 
         #Add one aruco to rectangle list
         msg.append(aruco_msg)
+
+        #Serial com in rs232
     
     return msg
 
