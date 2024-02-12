@@ -57,7 +57,7 @@ def publisher():
 
 
 
-def getPositionArucoMsg():
+def getPositionArucoMsg(corners, ids):
     """
     Get message for realtime position of arucos.
         corners (list)      ->      all detected aruco corners.
@@ -69,10 +69,8 @@ def getPositionArucoMsg():
     msg = [] #create msg
     aruco_msg = PositionPxRectangle()
     corner = PositionPx() #all corners will use the same instance of PositionPx
+    corner2 = PositionPx() #all corners will use the same instance of PositionPx
     corner.theta = 0 #no theta
-
-    #Get all Aruco tags
-    ids, corners = ros_detectAruco.detectAruco()
 
     #Fill msg array with all detected aruco tag
     for k in range(len(ids)):
@@ -84,8 +82,8 @@ def getPositionArucoMsg():
         aruco_msg.a_px = corner
         
         #Save top-left corner
-        corner.x, corner.y = corners[k][1]
-        aruco_msg.b_px = corner
+        corner2.x, corner2.y = corners[k][1]
+        aruco_msg.b_px = corner2
         
         #Save top-right corner
         corner.x, corner.y = corners[k][2]
@@ -102,3 +100,7 @@ def getPositionArucoMsg():
     
     return msg
 
+
+
+if __name__ == "__main__":
+    publisher()

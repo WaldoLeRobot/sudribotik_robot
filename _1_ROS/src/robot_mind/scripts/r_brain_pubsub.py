@@ -3,6 +3,7 @@ import os
 import sys
 import rospy
 import sqlite3
+import traceback
 from beacon_msgs.msg import ArrayPositionPx, ArrayPositionPxWithType, ArrayPositionPxRectangle
 
 FILE_PATH = os.path.abspath(__file__)
@@ -25,27 +26,23 @@ class RBrainNode:
 
         #This node will listen to these topics
         rospy.Subscriber("robot1/position/aruco", ArrayPositionPxRectangle, self.arucoPosFromRobotCallback)
-        self.aruco_pos_from_robot = None #attribute to be sent to Louise
+        self.aruco_pos_from_robot = None #attribute to be sent to Louise 
 
         #This node will publish to these topics
         self.arucoPos_pub = rospy.Publisher("robot1/mind/aruco", ArrayPositionPxRectangle, queue_size=10)
-    
-
-    # Keeps python from exiting until this node is stopped
-    # also it permits to this node to listen to new messages on mentioned topics
-    # and to run specified callbacks
-    rospy.spin()
 
 
     def run(self):
 
         #Set publish rate
         rate = rospy.Rate(10) #in hz
-
+        
         while not rospy.is_shutdown():
-            
-            #Publish
-            self.arucoPos_pub.publish(self.aruco_pos_from_robot)
+
+            #Publish only if there is data
+            if self.aruco_pos_from_robot:
+                self.arucoPos_pub.publish(self.aruco_pos_from_robot)
+                self.aruco_pos_from_robot = None #reset to stop sending previous positions
             
             rate.sleep() #wait according to publish rate
 
@@ -58,7 +55,7 @@ class RBrainNode:
         """
 
         #Update attribute to be sent to beacon
-        self.aruco_pos_from_robot = data
+        self.aruco_pos_from_robot = data.array_of_rectangles
 
         #Fill the dict with aruco tag data
         data_dict = {} 
@@ -85,4 +82,11 @@ class RBrainNode:
 
 
 if __name__ == '__main__':
-    subscriber()
+    #Launch the node
+    try:
+        brain = RBrainNode()#instantiate it
+        brain.run()
+    except Exception as e:
+        traceback.print_exc()
+        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {e}")
+
