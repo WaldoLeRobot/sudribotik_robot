@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 import os
 import sys
-import time
-import json
 import rospy
 import cv2
-import math
 
 FILE_PATH = os.path.abspath(__file__)
 FILE_NAME = os.path.basename(FILE_PATH)
@@ -68,9 +65,10 @@ def getPositionArucoMsg(corners, ids):
 
     msg = [] #create msg
     aruco_msg = PositionPxRectangle()
-    corner = PositionPx() #all corners will use the same instance of PositionPx
-    corner2 = PositionPx() #all corners will use the same instance of PositionPx
-    corner.theta = 0 #no theta
+    cornera = PositionPx() #create instances of PositionPx
+    cornerb = PositionPx()
+    cornerc = PositionPx()
+    cornerd = PositionPx()
 
     #Fill msg array with all detected aruco tag
     for k in range(len(ids)):
@@ -78,25 +76,24 @@ def getPositionArucoMsg(corners, ids):
         aruco_msg.id = ids[k]
         
         #Save bottom-left corner
-        corner.x, corner.y = corners[k][0]
-        aruco_msg.a_px = corner
+        cornera.x, cornera.y = corners[k][0]
+        aruco_msg.a_px = cornera
         
         #Save top-left corner
-        corner2.x, corner2.y = corners[k][1]
-        aruco_msg.b_px = corner2
+        cornerb.x, cornerb.y = corners[k][1]
+        aruco_msg.b_px = cornerb
         
         #Save top-right corner
-        corner.x, corner.y = corners[k][2]
-        aruco_msg.c_px = corner
+        cornerc.x, cornerc.y = corners[k][2]
+        aruco_msg.c_px = cornerc
         
         #Save bottom-right corner
-        corner.x, corner.y = corners[k][3]
-        aruco_msg.d_px = corner
+        cornerd.x, cornerd.y = corners[k][3]
+        aruco_msg.d_px = cornerd
 
         #Add one aruco to rectangle list
         msg.append(aruco_msg)
 
-        #Serial com in rs232
     
     return msg
 

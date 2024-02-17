@@ -12,10 +12,10 @@ FILE_NAME = os.path.basename(FILE_PATH)
 sys.path.insert(1, FILE_PATH.split("_1_ROS")[0]) #add parent folder to python path
 from _3_BASE_DE_DONNEES import databaseManager
 
-
+    
 class RBrainNode:
     """
-    This ROS node is mainly a bridge between the robot and the beacon.
+    This ROS node mainly serves as a bridge between the robot and the beacon.
     """
     
     

@@ -10,7 +10,7 @@
 # ./run_waldo_docker.sh
 
 
-# Define Docker volumes and environment variables
+#Define Docker volumes, environment variables and devices
 #volume 1 -> used to share X server (graphic) between host and container
 #volume 2 -> used to authorize container to use host X server
 #volume 3 -> mount host Ros working directory on container Ros workspace
@@ -29,8 +29,13 @@ DOCKER_ENV_VARS="
 --env="QT_X11_NO_MITSHM=1" \
 "
 
+#device 1 -> to connect an usb serial port, used for the lidar
+DOCKER_DEVICES="
+--device=/dev/ttyUSB0
+"
+
 # Define final docker run args
-DOCKER_ARGS=${DOCKER_VOLUMES}" "${DOCKER_ENV_VARS}
+DOCKER_ARGS=${DOCKER_VOLUMES}" "${DOCKER_ENV_VARS}" "${DOCKER_DEVICES}
 
 # Authorize all graphical connection made by a docker container to my pc
 xhost + local:docker 1>/dev/null &

@@ -1,0 +1,11 @@
+<launch>
+  <!-- Launch the ROS master 
+  <node pkg="roscore" type="roscore" name="roscore" output="screen"/>-->
+
+  <node pkg="robot_mind" type="r_brain_pubsub.py" name="brain" output="screen"/>
+
+  <node pkg="robot_mind" type="r_strategy_pubsub.py" name="startegy" output="screen"/>
+
+  <node pkg="camera_detection" type="r_camera_pub.py" name="r_camera" output="screen"/>
+  
+</launch>
