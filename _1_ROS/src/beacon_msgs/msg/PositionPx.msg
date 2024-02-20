@@ -1,3 +1,3 @@
-int32 x
+int32 x #in mm
 int32 y 
-int32 theta
+float32 theta #in radians [-pi;pi]

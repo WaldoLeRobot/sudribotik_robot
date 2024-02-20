@@ -6,8 +6,7 @@ import serial
 import sys
 import traceback
 from sensor_msgs.msg import LaserScan
-from geometry_msgs.msg import Point, Pose, PoseArray
-from beacon_msgs.msg import ArrayPositionPx, ArrayPositionPxWithType, ArrayPositionPxRectangle
+from beacon_msgs.msg import ArrayPositionPx, PositionPx, ArrayPositionPxRectangle
 
 FILE_PATH = os.path.abspath(__file__)
 FILE_NAME = os.path.basename(FILE_PATH)
@@ -34,8 +33,8 @@ class LidarNode:
         #rospy.Subscriber("robot1/position/self", Point, self.getSelfPositionCallback)
         self.self_position_x = 150#None #attributes saving self position in mm
         self.self_position_y = 150#None 
-        self.self_position_z = 0 #Z position will not be updated
-        self.self_position_theta = 0 #None #in radians (60°)
+        self.self_position_z = 0 #z position will not be updated
+        self.self_position_theta = 0 #None
 
         rospy.Subscriber("robot1/lidar/rawdata", LaserScan, self.getLidarDataCallback)
         self.lidar_ranges = None#attributes saving lidar data
@@ -44,7 +43,7 @@ class LidarNode:
         self.ANGLE_INCREMENT = self.NB_OF_RANGES/(2*math.pi) #unitary angle between two consecutives lasers
 
         #This node will publish to this topic
-        self.otherRobotsPos_pub = rospy.Publisher("robot1/position/otherRobots", PoseArray, queue_size=10)
+        self.otherRobotsPos_pub = rospy.Publisher("robot1/position/otherRobots", ArrayPositionPx, queue_size=10)
 
     def run(self):
 
@@ -75,7 +74,7 @@ class LidarNode:
         self.self_position_y = data.y
 
         #Convert theta from range [-pi;pi] to [0;2pi]
-        # so its still in radians but in a different range.
+        # so its still in radians but in a different range matching the one ues by the lidar raw data
         self.self_position_theta = (data.theta + 2*math.pi) % (2*math.pi)
 
 
@@ -88,26 +87,26 @@ class LidarNode:
 
     def isRangeOnBoard(self, index, range, x_robot, y_robot, theta_robot):
         """
-        Calculate whether a range is on board or not.
+        Calculate whether a range is on board or not
             index (int)         ->  index of the range based on his angle.
             range (float)       ->  lidar range of a single pulse (in meter).
             x_robot (float)     ->  position x of the robot in meters.
             y_robot (float)     ->  position y of the robot in meters.
             theta_robot (float) ->  angle of the robot in radians [0;2pi].
         
-        Return True if the range is on board, False if not.
+        Return True and its position (x,y) if the range is on board, False and (None, None) if not.
         """
 
         #Filter nan values
         if not range :
-            return False
+            return False, (None, None)
         
         #Find laser quadrant
         theta_relative = (theta_robot + (index*self.ANGLE_INCREMENT)) % (2*math.pi) #angle of the laser relative to the board
         quadrant = math.ceil(theta_relative/(math.pi/2)+0.00001) #in case theta_relative=0 we add a tiny float number
 
         #Get values to compare x and y projection of the range
-        if quadrant == 1 :
+        if   quadrant == 1 :
             max_x_inside = self.BOARD_WIDTH_IN_METER - x_robot
             max_y_inside = y_robot
 
@@ -128,7 +127,15 @@ class LidarNode:
         y_projection = abs(range * math.sin(self.ANGLE_INCREMENT*index))            
 
         #Compare these values to know if they are inside or not
-        return (x_projection < max_x_inside) and (y_projection < max_y_inside)
+        if (x_projection < max_x_inside) and (y_projection < max_y_inside):
+
+            #Only calculate position on an object if its inside the board to limit calculations
+            if   quadrant == 1 :return True, (x_robot + x_projection, y_robot - y_projection)
+            elif quadrant == 2 :return True, (x_robot - x_projection, y_robot - y_projection)
+            elif quadrant == 3 :return True, (x_robot - x_projection, y_robot + y_projection)
+            elif quadrant == 4 :return True, (x_robot + x_projection, y_robot + y_projection)
+        else :
+            return False, (None, None)
 
         
 
@@ -151,29 +158,72 @@ class LidarNode:
         else :
             return msg
 
-        #Filter positions outside of the board by creating a mask.
-        # this mask will contain 456 boolean values paired with their lidar_range.
-        # if the range is on board its corresponding index is set to True.
-        mask_on_range = [self.isRangeOnBoard(index, range,
-                                             current_robot_x,
-                                             current_robot_y,
-                                             current_robot_theta) for index, range in enumerate(current_lidar_ranges)]
+        #Filter out positions outside the board.
+        lidar_ranges_on_board_index = [] #this will contain index of ranges inside the board
+        lidar_ranges_on_board_position = [] #this will contain ranges position, it will follow the index list
+        for index, range in enumerate(current_lidar_ranges) :
+            
+            #Get position of ranges inside the board
+            is_inside, pos = self.isRangeOnBoard(index, range,current_robot_x, current_robot_y, current_robot_theta)
 
-        #Apply the mask on the ranges
-        lidar_ranges_on_board = [value for value, mask_value in zip(current_lidar_ranges, mask_on_range) if mask_value]
-
-        #Create a list tracking index of ranges inside the board
-        lidar_ranges_on_board_index = [idx for idx in range(len(current_lidar_ranges)) if mask_on_range[idx]]
-
-        print(lidar_ranges_on_board[:20])
-        print(lidar_ranges_on_board_index[:20])
-
-        #Regroup each range with close index then take the middle one
+            if is_inside :
+                lidar_ranges_on_board_index.append(index) #store index
+                lidar_ranges_on_board_position.append(pos) #store position
 
 
-        other_robot_pos = Pose()
-        other_robot_point = Point()
-        other_robot_point.z = 0
+        #Regroup each range with close index then take the middle one       
+        #This constant set the max number of index missing between two index
+        MISSING_VALUE_TOLERANCE = 2      
+        #This constant set the minimum number of consecutives ranges detected by the lidar to be considered a solid object
+        MINIMUM_NB_OF_RANGES = 3  #it's purpose is to eliminate potential noises
+        previous_index = None
+        middle_index_list = [] #this will store the index of the position of the other robot
+        temp_list = [] #this will store a list of following index
+
+        for idx,range_index in enumerate(lidar_ranges_on_board_index):
+            
+            #The first index is always took 
+            if idx == 0:
+                previous_index = range_index
+                temp_list.append(range_index) #don't forget to add it to the following index list
+                continue
+            
+            #Store next index until the difference between the previous and the current is over the tolerance
+            # OR if it's the last index in the list
+            if (range_index - previous_index > MISSING_VALUE_TOLERANCE) or (idx==len(lidar_ranges_on_board_index)-1):
+
+                #Add the middle index to the middle_index_list only if there is enough ranges.
+                if len(temp_list) >= MINIMUM_NB_OF_RANGES :
+                    middle_index_list.append(temp_list[len(temp_list)//2])
+
+                #Set a new previous index and clear the following index list to start over
+                previous_index = range_index
+                temp_list.clear()
+                temp_list.append(range_index) 
+                continue
+
+            else :
+                #The index is not big enough to start a new group so add it to the list
+                temp_list.append(range_index)
+                previous_index = range_index
+
+
+        #Create a Position with all the middle ranges selected
+        print(f"\n\n----------\nIl y a {len(middle_index_list)} objet(s) sur le plateau.")
+        for k,idx in enumerate(middle_index_list):
+
+            #Instatnciate a PositionPx msg
+            other_robot_pos = PositionPx()
+            other_robot_pos.theta = 0
+
+            #Get the popsition of the laser using the index of its middle position
+            pos_x, pos_y =  lidar_ranges_on_board_position[lidar_ranges_on_board_index.index(idx)]
+            other_robot_pos.x = int(pos_x*1000) #convert to mm and cast to int
+            other_robot_pos.y = int(pos_y*1000)
+
+            #Add to msg
+            print(f"{k+1}:\tx: {other_robot_pos.x}\n\ty: {other_robot_pos.y}")
+            msg.append(other_robot_pos)
 
         return msg
 
