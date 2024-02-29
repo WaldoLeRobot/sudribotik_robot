@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import numpy as np
 import math
 import os
@@ -56,9 +57,11 @@ class LidarNode:
             if self.self_position_x and self.self_position_y:
                 
                 self.getPositionOfOtherRobotsMsg()
-                #self.otherRobotsPos_pub.publish(self.getPositionOfOtherRobotsMsg()) #publish
+                #Publish
+                #self.otherRobotsPos_pub.publish(self.getPositionOfOtherRobotsMsg())
 
-                #self.self_position_x = None #current position reset
+                #Current position reset
+                #self.self_position_x = None
                 #self.self_position_y = None 
                 #self.self_position_theta = None 
             

@@ -18,11 +18,15 @@ MAX_DATA_COUNT = 50 #max of rows alowed in a table
 
 def init_database_robot():
     """
-    This function delete a previous database then create and initalize an empty database.
-    There is currently 6 tables initialized :            
-            r_aruco
-            
-    You can add more following the gloabl pattern.
+    Delete a previous database then create and initalize an empty database.
+
+
+    Note:
+        There is currently 6 tables initialized :            
+                r_aruco
+                r_other_robots
+                
+        You can add more following the gloabl pattern.
     """
 
     #Delete previous one if it exists
@@ -52,6 +56,18 @@ def init_database_robot():
             connection.commit()
 
 
+            #Create these tables if they dont exist
+            cursor.execute(''' CREATE TABLE IF NOT EXISTS r_other_robots
+                        (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        position_x INTEGER,
+                        position_y INTEGER,
+                        position_theta REAL
+                        )
+                        ''')
+            connection.commit()
+
+
         except sqlite3.Error as e:
             traceback_str = traceback.format_exc()
             print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {e}\n{traceback_str}")
@@ -63,11 +79,13 @@ def insertData(table_name:str, data:dict):
     """
     Insert data into its appropriate table.
 
-        table_name (str)    ->      table name.\n
-        data (dict)         ->      data to insert with key as column and value as data.
-                                    values must match accepted SQL types format.
+    Pararmeters:
+        - table_name (str): table name.
+        - data (dict): data to insert with key as column and value as data.
+                       values must match accepted SQL types format.
     
-    Return function success.
+    Returns:
+        - bool: function success.
     """
     success = False
 

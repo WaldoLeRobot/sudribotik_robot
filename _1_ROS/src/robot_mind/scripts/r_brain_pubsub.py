@@ -15,7 +15,7 @@ from _3_BASE_DE_DONNEES import databaseManager
     
 class RBrainNode:
     """
-    This ROS node mainly serves as a bridge between the robot and the beacon.
+    This ROS centralize all data from other node to insert them into a database.
     """
     
     
@@ -26,7 +26,7 @@ class RBrainNode:
 
         #This node will listen to these topics
         rospy.Subscriber("robot1/position/aruco", ArrayPositionPxRectangle, self.arucoPosFromRobotCallback)
-        self.aruco_pos_from_robot = None #attribute to be sent to Louise 
+        rospy.Subscriber("robot1/position/otherRobots", ArrayPositionPx, self.otherRobotsPosFromLidarCallback)
 
         #This node will publish to these topics
         self.arucoPos_pub = rospy.Publisher("robot1/mind/aruco", ArrayPositionPxRectangle, queue_size=10)
@@ -38,11 +38,6 @@ class RBrainNode:
         rate = rospy.Rate(10) #in hz
         
         while not rospy.is_shutdown():
-
-            #Publish only if there is data
-            if self.aruco_pos_from_robot:
-                self.arucoPos_pub.publish(self.aruco_pos_from_robot)
-                self.aruco_pos_from_robot = None #reset to stop sending previous positions
             
             rate.sleep() #wait according to publish rate
 
@@ -53,9 +48,6 @@ class RBrainNode:
         """
         Callback for aruco tags raw position detected by robot front camera.
         """
-
-        #Update attribute to be sent to beacon
-        self.aruco_pos_from_robot = data.array_of_rectangles
 
         #Fill the dict with aruco tag data
         data_dict = {} 
@@ -76,8 +68,23 @@ class RBrainNode:
         
             #Update database
             databaseManager.insertData("r_aruco", data_dict)
-        
+    
 
+
+    def otherRobotsPosFromLidarCallback(self, data):
+        """
+        Callback for position of other robots detectd and calculated by the lidar node.
+        """
+        
+        #Fill the dict with positions of other robot
+        data_dict = {}
+        for pos in data.array_of_positionspx:
+            data_dict["position_x"] = pos.x
+            data_dict["position_y"] = pos.y
+            data_dict["position_theta"] = pos.theta
+
+            #Update database
+            databaseManager.insertData("r_other_robots", data_dict)
 
 
 

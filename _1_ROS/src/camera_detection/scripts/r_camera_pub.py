@@ -57,10 +57,13 @@ def publisher():
 def getPositionArucoMsg(corners, ids):
     """
     Get message for realtime position of arucos.
-        corners (list)      ->      all detected aruco corners.
-        ids (list)          ->      all detected aruco ids.
 
-    Return an ArrayPositionPxRectangle msg.
+    Parameters:
+        - corners (list): all detected aruco corners.
+        - ids (list): all detected aruco ids.
+
+    Returns:
+        - ArrayPositionPxRectangle: msg generated.
     """
 
     msg = [] #create msg
