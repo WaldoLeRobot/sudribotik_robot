@@ -1,11 +1,18 @@
 <launch>
-  <!-- Launch the ROS master 
-  <node pkg="roscore" type="roscore" name="roscore" output="screen"/>-->
+  <!-- Launch the ROS master -->
+  <node pkg="roscore" type="roscore" name="roscore" output="screen"/>
 
-  <node pkg="robot_mind" type="r_brain_pubsub.py" name="brain" output="screen"/>
+  <!-- Launch the lidar -->
+  <include file="$(find ldlidar_stl_ros)/launch/ld06.launch"/>
+  <node pkg="lidar_detection" type="r_lidar_pubsub.py" name="r_lidar" output="screen"/>
 
-  <node pkg="robot_mind" type="r_strategy_pubsub.py" name="startegy" output="screen"/>
-
+  <!-- Launch camera for vision-->
   <node pkg="camera_detection" type="r_camera_pub.py" name="r_camera" output="screen"/>
+
+  <!-- Launch the brain for the database -->
+  <node pkg="robot_mind" type="r_brain_pubsub.py" name="r_brain" output="screen"/>
+
+  <!-- Launch the strategy for direct actions -->
+  <node pkg="robot_mind" type="r_strategy_pubsub.py" name="r_startegy" output="screen"/>
   
 </launch>
