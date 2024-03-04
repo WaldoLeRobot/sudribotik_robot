@@ -23,8 +23,8 @@ class LidarNode:
     def __init__(self):
 
         #Constants board values
-        self.BOARD_WIDTH_IN_METER = 0.3
-        self.BOARD_HEIGHT_IN_METER = 0.3
+        self.BOARD_WIDTH_IN_METER = 3
+        self.BOARD_HEIGHT_IN_METER = 3
 
         #Initialize  and tell node name to rospy
         rospy.init_node('r_lidar', anonymous=True)
@@ -114,7 +114,7 @@ class LidarNode:
         
         #Find laser quadrant
         theta_relative = (theta_robot + (index*angle_increment)) % (2*math.pi) #angle of the laser relative to the board
-        quadrant = math.ceil(theta_relative/(math.pi/2)+0.00001) #in case theta_relative=0 we add a tiny float number
+        quadrant = math.ceil(theta_relative/(math.pi/2)+0.000000000000000000000001) #in case theta_relative=0 we add a tiny float number 
         
         #Get values to compare x and y projection of the range
         if   quadrant == 1 :
@@ -133,7 +133,8 @@ class LidarNode:
         elif quadrant == 4 :
             max_x_inside = self.BOARD_WIDTH_IN_METER - x_robot
             max_y_inside = self.BOARD_HEIGHT_IN_METER - y_robot
-                    
+        else:
+            print(f"quadrant:{quadrant}\ntheta_robot:{theta_robot}\nindex:{index}\nangle_increment:{angle_increment}\ntheta_relative:{theta_relative}")
         #Project the range on the x and y axes
         x_projection = abs(range * math.cos(theta_relative))
         y_projection = abs(range * math.sin(theta_relative))         
@@ -257,7 +258,7 @@ class LidarNode:
             middle_index_list.pop()
 
         #Create a Position with all the middle ranges selected
-        #print(f"\n\n----------\nIl y a {len(middle_index_list)} objet(s) sur le plateau.")
+        print(f"\n\n----------\nIl y a {len(middle_index_list)} objet(s) sur le plateau.")
         for k,idx in enumerate(middle_index_list):
 
             #Instatnciate a PositionPx msg
@@ -270,8 +271,8 @@ class LidarNode:
             other_robot_pos.y = int(pos_y*1000)
 
             #Add to msg
-            #quadrant = lidar_ranges_on_board_quadrant[lidar_ranges_on_board_index.index(idx)]
-            #print(f"{k+1}:\tx: {other_robot_pos.x}\n\ty: {other_robot_pos.y}\n\tquadrant: {quadrant}")
+            quadrant = lidar_ranges_on_board_quadrant[lidar_ranges_on_board_index.index(idx)]
+            print(f"{k+1}:\tx: {other_robot_pos.x}\n\ty: {other_robot_pos.y}\n\tquadrant: {quadrant}")
             msg.append(other_robot_pos)
 
         return msg
