@@ -1,11 +1,6 @@
 <launch>
 
-  <!-- Verify that the beacon launch its roscore on the same network than 
-  the robot before launching other nodes -->
-  <condition test="$(find robot_launch)/scripts/verify_beacon_roscore.py" />
-
-
-  <!-- Continue like a basic_start but without Waldo roscore -->
+  <!-- Like a basic_start but without Waldo roscore -->
 
   <!-- Launch the lidar -->
   <include file="$(find ldlidar_stl_ros)/launch/ld06.launch"/>
