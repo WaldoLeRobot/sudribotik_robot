@@ -33,9 +33,9 @@ class RStrategyNode:
         self.serial_asserv = self.setSerialConnection()
 
 
-    def getSerialConnection():
+    def setSerialConnection(self):
         """
-        Get serial connection between this raspberry and the asserv card.
+        Set serial connection between this raspberry and the asserv card.
         """
         serial_port = '/dev/ttyUSB1'
         Baudrate=1000000    
