@@ -10,7 +10,7 @@ FILE_PATH = os.path.abspath(__file__)
 FILE_NAME = os.path.basename(FILE_PATH)
 
 sys.path.insert(1, FILE_PATH.split("_1_ROS")[0]) #add parent folder to python path
-#from _4_SERIALUS_M2M import serialusM2M
+from _4_SERIALUS_M2M import serialusM2M, fonction_deplacement
     
 class RStrategyNode:
     """
@@ -31,7 +31,7 @@ class RStrategyNode:
         self.other_robots_pos = None
 
         #Establish serial connection
-        #self.serial_asserv = self.setSerialConnection()
+        self.serial_asserv = self.setSerialConnection()
 
 
     def getSerialConnection():
@@ -48,17 +48,17 @@ class RStrategyNode:
 
     def run(self):
         """
-        OPERATE HERE, ALL ACTIONS MUST BE WROTE IN THE WHILE LOOPNOF THIS FUNCTION
+        OPERATE HERE, ALL ACTIONS MUST BE WROTE IN THE WHILE LOOP OF THIS FUNCTION
         """
         #Set publish rate
         rate = rospy.Rate(10) #in hz
         
         while not rospy.is_shutdown():
-            
+            fonction_deplacement.avancer("1500","100", self.serial_asserv)
             rate.sleep() #wait according to publish rate
         
         #Close serial connection
-        #self.serial_asserv.close()
+        self.serial_asserv.close()
 
 
     def arucoPosFromRobotCallback(self, data):

@@ -1,0 +1,11 @@
+{
+	"_this_is_a_comment": "Make sure to put EVERYTHING in a list",
+
+    "WHO_AM_I": ["Waldo"],
+
+    "SELF_IP_ADDRESS_ON_SELF_HOTSPOT": ["181.60.0.1"],
+
+    "SELF_IP_ADDRESS_ON_TPLINK": ["192.168.0.120"],
+
+    "LOUISE_IP_ON_TPLINK": ["192.168.0.110"]
+}

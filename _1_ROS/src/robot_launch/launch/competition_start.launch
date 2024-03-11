@@ -1,0 +1,23 @@
+<launch>
+
+  <!-- Verify that the beacon launch its roscore on the same network than 
+  the robot before launching other nodes -->
+  <condition test="$(find robot_launch)/scripts/verify_beacon_roscore.py" />
+
+
+  <!-- Continue like a basic_start but without Waldo roscore -->
+
+  <!-- Launch the lidar -->
+  <include file="$(find ldlidar_stl_ros)/launch/ld06.launch"/>
+  <node pkg="lidar_detection" type="r_lidar_pubsub.py" name="r_lidar" output="screen"/>
+
+  <!-- Launch camera for vision-->
+  <node pkg="camera_detection" type="r_camera_pub.py" name="r_camera" output="screen"/>
+
+  <!-- Launch the brain for the database -->
+  <node pkg="robot_mind" type="r_brain_pubsub.py" name="r_brain" output="screen"/>
+
+  <!-- Launch the strategy for direct actions -->
+  <node pkg="robot_mind" type="r_strategy_pubsub.py" name="r_startegy" output="screen"/>
+  
+</launch>

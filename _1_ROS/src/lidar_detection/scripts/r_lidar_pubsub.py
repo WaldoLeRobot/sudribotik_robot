@@ -24,7 +24,7 @@ class LidarNode:
 
         #Constants board values
         self.BOARD_WIDTH_IN_METER = 3
-        self.BOARD_HEIGHT_IN_METER = 3
+        self.BOARD_HEIGHT_IN_METER = 2
 
         #Initialize  and tell node name to rospy
         rospy.init_node('r_lidar', anonymous=True)
@@ -35,9 +35,7 @@ class LidarNode:
         self.self_position_y = 150#None 
         self.self_position_z = 0 #z position will not be updated
         self.self_position_theta = 0 #None
-
         rospy.Subscriber("robot1/lidar/rawdata", LaserScan, self.getLidarDataCallback)
-        #Define attributes saving lidar data
         self.lidar_ranges = None #length in meter between lidar and touched object 
         self.lidar_intensities = None 
         self.lidar_angle_increment = None #unitary angle between two consecutives lasers, somehow this number vary
@@ -59,7 +57,7 @@ class LidarNode:
                 #Publish
                 self.otherRobotsPos_pub.publish(self.getPositionOfOtherRobotsMsg())
 
-                #Current position reset
+                #Force current position reset
                 #self.self_position_x = None
                 #self.self_position_y = None 
                 #self.self_position_theta = None 
