@@ -2,6 +2,7 @@
 *.jpg
 *.jpeg
 *.png
+*.db
 
 #Python stuff
 __pycache__

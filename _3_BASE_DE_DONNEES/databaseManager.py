@@ -31,6 +31,7 @@ def init_database_robot():
 
     #Delete previous one if it exists
     if os.path.isfile(FILE_PATH_FOR_DATABASE):
+        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Réinitialisation de la base de donnée...")
         os.remove(FILE_PATH_FOR_DATABASE)
 
     #Connect to database and close it when <with> block is exited

@@ -2,7 +2,6 @@
 import os
 import sys
 import rospy
-import sqlite3
 import traceback
 from beacon_msgs.msg import ArrayPositionPx, ArrayPositionPxWithType, ArrayPositionPxRectangle
 

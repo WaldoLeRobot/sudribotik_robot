@@ -38,7 +38,7 @@ def set_pos(x,y,t,ser):
         return False
     if len(t)!=3:
         return False
-    reponse = s.Envoi_reponse(code_function + x + y, ser)
+    reponse = s.Envoi_reponse(code_function + x + y+t, ser)
     return reponse[1]
 
 def Callage_All(distance, vitesse, ser):
