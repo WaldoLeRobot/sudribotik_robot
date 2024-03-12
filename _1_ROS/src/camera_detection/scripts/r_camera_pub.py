@@ -36,7 +36,7 @@ def publisher():
 
         #Go to next loop if there is no image to read
         if not ret:
-            print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Problème avec la caméra.")
+            print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Problème avec la caméra!")
             continue
 
         #Search for Aruco tags

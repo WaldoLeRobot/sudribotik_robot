@@ -8,8 +8,10 @@ from beacon_msgs.msg import ArrayPositionPx, ArrayPositionPxWithType, ArrayPosit
 FILE_PATH = os.path.abspath(__file__)
 FILE_NAME = os.path.basename(FILE_PATH)
 
-sys.path.insert(1, FILE_PATH.split("_1_ROS")[0]) #add parent folder to python path
-from _4_SERIALUS_M2M import serialusM2M, fonction_deplacement
+#sys.path.insert(1, FILE_PATH.split("_1_ROS")[0]) #add parent folder to python path
+sys.path.insert(1, FILE_PATH.split("_1_ROS")[0] + "_4_SERIALUS_M2M/") #add parent folder to python path
+import serialusM2M as serialus
+import fonction_deplacement as fdd
     
 class RStrategyNode:
     """
@@ -30,7 +32,9 @@ class RStrategyNode:
         self.other_robots_pos = None
 
         #Establish serial connection
-        self.serial_asserv = self.setSerialConnection()
+        self.serial_asserv = None
+        while not self.serial_asserv:
+             self.serial_asserv = self.setSerialConnection()
 
 
     def setSerialConnection(self):
@@ -41,23 +45,33 @@ class RStrategyNode:
         Baudrate=1000000    
         ttl9600=False
         Timeout=5
+        print(1111)
+        #Try to instanciate a comunication between the Pi and the asserv card
+        try:
+            serial = serialus.init_serial(Baudrate,serial_port,Timeout,ttl9600)
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {e}")
+            print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Avez-vous bien branché la carte d'asservissement ?")
+            serial = None
 
-        return serialusM2M.init_serial(Baudrate,serial_port,Timeout,ttl9600)
-
+        return serial
 
     def run(self):
         """
         OPERATE HERE, ALL ACTIONS MUST BE WROTE IN THE WHILE LOOP OF THIS FUNCTION
         """
         #Set publish rate
-        rate = rospy.Rate(10) #in hz
+        rate = rospy.Rate(10) #in hz        
+        print(2222)
         
         while not rospy.is_shutdown():
-            fonction_deplacement.avancer("1500","100", self.serial_asserv)
+            print(3333)
+            #fdd.avancer("1500","100", self.serial_asserv)
             rate.sleep() #wait according to publish rate
         
         #Close serial connection
-        self.serial_asserv.close()
+        #self.serial_asserv.close()
 
 
     def arucoPosFromRobotCallback(self, data):
@@ -81,9 +95,10 @@ class RStrategyNode:
 
 if __name__ == '__main__':
     #Launch the node
-    try:
-        strategy = RStrategyNode()#instantiate it
-        strategy.run()
-    except Exception as e:
-        traceback.print_exc()
-        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {e}")
+    print("START STRATEGY")
+    strategy = RStrategyNode()#instantiate it
+    strategy.run()
+    print(0000)
+    #except Exception as e:
+        #traceback.print_exc()
+        #print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {e}")
