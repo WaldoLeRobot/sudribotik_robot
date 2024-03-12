@@ -41,7 +41,7 @@ class RStrategyNode:
         """
         Set serial connection between this raspberry and the asserv card.
         """
-        serial_port = '/dev/ttyUSB1'
+        serial_port = '/dev/AMA0'
         Baudrate=1000000    
         ttl9600=False
         Timeout=5
@@ -50,9 +50,9 @@ class RStrategyNode:
         try:
             serial = serialus.init_serial(Baudrate,serial_port,Timeout,ttl9600)
         except Exception as e:
-            traceback.print_exc()
             print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {e}")
-            print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Avez-vous bien branché la carte d'asservissement ?")
+            print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Avez-vous bien branché la carte d'asservissement "+\
+                  f"sur le port {serial_port} ?")
             serial = None
 
         return serial
