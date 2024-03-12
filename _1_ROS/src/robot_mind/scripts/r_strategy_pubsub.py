@@ -9,9 +9,10 @@ FILE_PATH = os.path.abspath(__file__)
 FILE_NAME = os.path.basename(FILE_PATH)
 
 #sys.path.insert(1, FILE_PATH.split("_1_ROS")[0]) #add parent folder to python path
-sys.path.insert(1, FILE_PATH.split("_1_ROS")[0] + "_4_SERIALUS_M2M/") #add parent folder to python path
+sys.path.insert(1, FILE_PATH.split("_1_ROS")[0] + "_4_SERIALUS_M2M/") #add SerialusM2M path
 import serialusM2M as serialus
 import fonction_deplacement as fdd
+import fonction_PID as fpid
     
 class RStrategyNode:
     """
@@ -36,16 +37,23 @@ class RStrategyNode:
         while not self.serial_asserv:
              self.serial_asserv = self.setSerialConnection()
 
+        #Set PID parameters
+        fpid.set_ENTRAXE_MM("033600", self.serial_asserv)
+        fpid.set_PERIMETRE_ROUE_MM("021000", self.serial_asserv)
+        fpid.set_PID_VITESSE_DIST("06500", "05500", "99000", self.serial_asserv)
+        fpid.set_PID_BREAK("01250", "00600","20000", self.serial_asserv)
+        fpid.set_MAX_ERREUR_INTEGRALLE_V("045000", self.serial_asserv)
+        fpid.set_MAX_E_INTEGRALLE_BRAKE("000500", self.serial_asserv)
+
 
     def setSerialConnection(self):
         """
         Set serial connection between this raspberry and the asserv card.
         """
-        serial_port = '/dev/AMA0'
+        serial_port = '/dev/ttyAMA0'
         Baudrate=1000000    
         ttl9600=False
         Timeout=5
-        print(1111)
         #Try to instanciate a comunication between the Pi and the asserv card
         try:
             serial = serialus.init_serial(Baudrate,serial_port,Timeout,ttl9600)
@@ -63,15 +71,15 @@ class RStrategyNode:
         """
         #Set publish rate
         rate = rospy.Rate(10) #in hz        
-        print(2222)
-        
+
         while not rospy.is_shutdown():
-            print(3333)
-            #fdd.avancer("1500","100", self.serial_asserv)
+            print("JE SUIS EN TRAIN D'AVANCER")
+            print(fdd.avancer("0200","100", self.serial_asserv))
+            print(fdd.reculer("0200","100", self.serial_asserv))
             rate.sleep() #wait according to publish rate
         
         #Close serial connection
-        #self.serial_asserv.close()
+        self.serial_asserv.close()
 
 
     def arucoPosFromRobotCallback(self, data):
@@ -98,7 +106,6 @@ if __name__ == '__main__':
     print("START STRATEGY")
     strategy = RStrategyNode()#instantiate it
     strategy.run()
-    print(0000)
     #except Exception as e:
         #traceback.print_exc()
         #print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {e}")
