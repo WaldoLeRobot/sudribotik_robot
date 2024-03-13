@@ -12,6 +12,7 @@ FILE_NAME = os.path.basename(FILE_PATH)
 sys.path.insert(1, FILE_PATH.split("_1_ROS")[0] + "_4_SERIALUS_M2M/") #add SerialusM2M path
 import serialusM2M as serialus
 import fonction_deplacement as fdd
+import fonction_Pos_Calage as fcalage
 import fonction_PID as fpid
     
 class RStrategyNode:
@@ -50,7 +51,7 @@ class RStrategyNode:
         """
         Set serial connection between this raspberry and the asserv card.
         """
-        serial_port = '/dev/ttyAMA0'
+        serial_port = '/dev/ttyUSB0'
         Baudrate=1000000    
         ttl9600=False
         Timeout=5
@@ -73,9 +74,7 @@ class RStrategyNode:
         rate = rospy.Rate(10) #in hz        
 
         while not rospy.is_shutdown():
-            print("JE SUIS EN TRAIN D'AVANCER")
-            print(fdd.avancer("0200","100", self.serial_asserv))
-            print(fdd.reculer("0200","100", self.serial_asserv))
+            fdd.avancer("0200","100", self.serial_asserv))
             rate.sleep() #wait according to publish rate
         
         #Close serial connection
