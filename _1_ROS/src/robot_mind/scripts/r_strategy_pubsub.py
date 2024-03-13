@@ -51,6 +51,7 @@ class RStrategyNode:
 
         #Set position
         print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Définitition de la position")
+
         fcalage.set_pos("2500", "0500", "090", self.serial_asserv)
 
 
