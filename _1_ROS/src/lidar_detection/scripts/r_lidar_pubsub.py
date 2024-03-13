@@ -33,8 +33,8 @@ class LidarNode:
         rospy.Subscriber("robot1/position/self", PositionPx, self.getSelfPositionCallback)
         self.self_position_x = None #attributes saving self position in mm
         self.self_position_y = None 
-        self.self_position_z = 0 #z position will not be updated
         self.self_position_theta = None
+        
         rospy.Subscriber("robot1/lidar/rawdata", LaserScan, self.getLidarDataCallback)
         self.lidar_ranges = None #length in meter between lidar and touched object 
         self.lidar_intensities = None 
@@ -68,9 +68,8 @@ class LidarNode:
         self.self_position_x = data.x #in milimeter
         self.self_position_y = data.y
 
-        #Convert theta from range [-pi;pi] to [0;2pi]
-        # so its still in radians but in a different range matching the one ues by the lidar raw data
-        self.self_position_theta = (data.theta + 2*math.pi) % (2*math.pi)
+        #Convert theta from range [0; 360] to [0;2pi]
+        self.self_position_theta = data.theta/180*math.pi
 
 
     def getLidarDataCallback(self, data):
@@ -120,8 +119,7 @@ class LidarNode:
 
         elif quadrant == 3 :
             max_x_inside = x_robot
-            max_y_inside = self.BOARD_HEIGHT_IN_METER - y_robot
-            
+            max_y_inside = self.BOARD_HEIGHT_IN_METER - y_robot            
 
         elif quadrant == 4 :
             max_x_inside = self.BOARD_WIDTH_IN_METER - x_robot
@@ -227,7 +225,7 @@ class LidarNode:
 
         #Finally there is a leap problem : if an object is seen at the front of the lidar
         # the object will be seen as a group for the first ranges [1,2,3,4,.. and for the last ranges ...,453,454,455,456].
-        # Whereas it is only one object at the front we end up with two objects dectected.
+        # Whereas it is only one object at the front we end up with two differents objects dectected.
         # We will address this in 4 steps:               
                           
         #1st We compare the position of the first and the last detected objects to see if there is a leap problem
@@ -235,12 +233,12 @@ class LidarNode:
         # last index must be part of a detected group
         if  len(middle_index_list)>1 and \
             LAST_INDEX_OF_LAST_DETECTED_OBJ + MISSING_VALUE_TOLERANCE > current_lidar_point_size and \
-            FIRST_INDEX_OF_FIRST_DETECTED_OBJ - (LAST_INDEX_OF_LAST_DETECTED_OBJ + MISSING_VALUE_TOLERANCE % current_lidar_point_size) < 0:  
+            FIRST_INDEX_OF_FIRST_DETECTED_OBJ - (LAST_INDEX_OF_LAST_DETECTED_OBJ + MISSING_VALUE_TOLERANCE)  % current_lidar_point_size < 0:  
 
+            #2nd Create a posx and posy with the mean of the first and last positions
             posx_first, posy_first = lidar_ranges_on_board_position[lidar_ranges_on_board_index.index(middle_index_list[0])]
             posx_last, posy_last = lidar_ranges_on_board_position[lidar_ranges_on_board_index.index(middle_index_list[-1])]
 
-            #2nd Create a posx and posy with the mean of the first and last positions
             posx_mean = (posx_first + posx_last)/2
             posy_mean = (posy_first + posy_last)/2
 
@@ -250,8 +248,8 @@ class LidarNode:
             #4th Delete the last detected object
             middle_index_list.pop()
 
-        #Create a Position with all the middle ranges selected
-        print(f"\n\n----------\nIl y a {len(middle_index_list)} objet(s) sur le plateau.")
+        #Create a Position point with all the middle ranges selected
+        #print(f"\n\n----------\nIl y a {len(middle_index_list)} objet(s) sur le plateau.")
         for k,idx in enumerate(middle_index_list):
 
             #Instatnciate a PositionPx msg
@@ -265,7 +263,7 @@ class LidarNode:
 
             #Add to msg
             quadrant = lidar_ranges_on_board_quadrant[lidar_ranges_on_board_index.index(idx)]
-            print(f"{k+1}:\tx: {other_robot_pos.x}\n\ty: {other_robot_pos.y}\n\tquadrant: {quadrant}")
+            #print(f"{k+1}:\tx: {other_robot_pos.x}\n\ty: {other_robot_pos.y}\n\tquadrant: {quadrant}")
             msg.append(other_robot_pos)
 
         return msg

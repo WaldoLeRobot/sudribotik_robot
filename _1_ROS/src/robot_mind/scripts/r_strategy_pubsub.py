@@ -42,6 +42,7 @@ class RStrategyNode:
              self.serial_asserv = self.setSerialConnection()
 
         #Set PID parameters
+        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Définitition du pid...")
         fpid.set_ENTRAXE_MM("033600", self.serial_asserv)
         fpid.set_PERIMETRE_ROUE_MM("021000", self.serial_asserv)
         fpid.set_PID_VITESSE_DIST("06500", "05500", "99000", self.serial_asserv)
@@ -50,8 +51,7 @@ class RStrategyNode:
         fpid.set_MAX_E_INTEGRALLE_BRAKE("000500", self.serial_asserv)
 
         #Set position
-        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Définitition de la position")
-
+        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Définitition de la position...")
         fcalage.set_pos("2500", "0500", "090", self.serial_asserv)
 
 
