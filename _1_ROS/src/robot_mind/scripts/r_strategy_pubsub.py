@@ -51,7 +51,7 @@ class RStrategyNode:
 
         #Set position
         print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Définitition de la position")
-        fcalage.set_pos("2850", "0200", "090", self.serial_asserv)
+        fcalage.set_pos("2500", "0500", "090", self.serial_asserv)
 
 
     def setSerialConnection(self):
@@ -84,7 +84,8 @@ class RStrategyNode:
             
             #Publish
             self.robotPos_pub.publish(self.getSelfPosition())
-            fdd.avancer("0200","100", self.serial_asserv)
+            print(fdd.orienter("100","100", self.serial_asserv))
+            exit(0)
             rate.sleep() #wait according to publish rate
         
         #Close serial connection
@@ -114,10 +115,9 @@ class RStrategyNode:
         
         #Test if serial connection is already initialized
         if self.serial_asserv :
-            print(fcalage.get_pos(self.serial_asserv))
-            exit(0)
-            self_pos.x = 0
-            self_pos.y = 0
+            ret_selfpos = fcalage.get_pos(self.serial_asserv)
+            self_pos.x = int(ret_selfpos[0])
+            self_pos.y = int(ret_selfpos[1])
             self_pos.theta = 0
 
             return self_pos
