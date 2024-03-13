@@ -3,7 +3,7 @@ import os
 import sys
 import rospy
 import traceback
-from beacon_msgs.msg import ArrayPositionPx, ArrayPositionPxWithType, ArrayPositionPxRectangle
+from beacon_msgs.msg import ArrayPositionPx, ArrayPositionPxWithType, ArrayPositionPxRectangle, PositionPx
 
 FILE_PATH = os.path.abspath(__file__)
 FILE_NAME = os.path.basename(FILE_PATH)
@@ -33,6 +33,9 @@ class RStrategyNode:
         rospy.Subscriber("robot1/position/otherRobots", ArrayPositionPx, self.otherRobotsPosFromLidarCallback)
         self.other_robots_pos = None
 
+        #This node will publish to these topics
+        self.robotPos_pub = rospy.Publisher("robot1/position/self", ArrayPositionPxRectangle, queue_size=10)
+
         #Establish serial connection
         self.serial_asserv = None
         while not self.serial_asserv:
@@ -45,6 +48,10 @@ class RStrategyNode:
         fpid.set_PID_BREAK("01250", "00600","20000", self.serial_asserv)
         fpid.set_MAX_ERREUR_INTEGRALLE_V("045000", self.serial_asserv)
         fpid.set_MAX_E_INTEGRALLE_BRAKE("000500", self.serial_asserv)
+
+        #Set position
+        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Définitition de la position")
+        fcalage.set_pos("2850", "0200", "090", self.serial_asserv)
 
 
     def setSerialConnection(self):
@@ -74,7 +81,10 @@ class RStrategyNode:
         rate = rospy.Rate(10) #in hz        
 
         while not rospy.is_shutdown():
-            fdd.avancer("0200","100", self.serial_asserv))
+            
+            #Publish
+            self.robotPos_pub.publish(self.getSelfPosition())
+            fdd.avancer("0200","100", self.serial_asserv)
             rate.sleep() #wait according to publish rate
         
         #Close serial connection
@@ -93,7 +103,26 @@ class RStrategyNode:
         Callback for position of other robots detectd and calculated by the lidar node.
         """
         self.other_robots_pos = data.array_of_positionspx
+    
 
+
+    def getSelfPosition(self):
+        """
+        Create message containing self position on the board.
+        """
+        self_pos = PositionPx()
+        
+        #Test if serial connection is already initialized
+        if self.serial_asserv :
+            print(fcalage.get_pos(self.serial_asserv))
+            exit(0)
+            self_pos.x = 0
+            self_pos.y = 0
+            self_pos.theta = 0
+
+            return self_pos
+
+        return None
 
 
 

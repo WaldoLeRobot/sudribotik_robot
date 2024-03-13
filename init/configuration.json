@@ -1,7 +1,11 @@
 {
 	"_this_is_a_comment": "Make sure to put EVERYTHING in a list",
 
-    "WHO_AM_I": ["Waldo"],
+    "WHO_AM_I": ["Waldo", "BLUE"],
+
+    "BLUE_ROBOT_FINISH_TARGETS": [[250, 1800], [2800, 100]],
+
+    "YELLOW_ROBOT_FINISH_TARGETS": [[250, 1800], [2800, 100]],
 
     "SELF_IP_ADDRESS_ON_SELF_HOTSPOT": ["181.60.0.1"],
 

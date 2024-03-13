@@ -30,11 +30,11 @@ class LidarNode:
         rospy.init_node('r_lidar', anonymous=True)
 
         #This node will listen to these topics
-        #rospy.Subscriber("robot1/position/self", Point, self.getSelfPositionCallback)
-        self.self_position_x = 150#None #attributes saving self position in mm
-        self.self_position_y = 150#None 
+        rospy.Subscriber("robot1/position/self", PositionPx, self.getSelfPositionCallback)
+        self.self_position_x = None #attributes saving self position in mm
+        self.self_position_y = None 
         self.self_position_z = 0 #z position will not be updated
-        self.self_position_theta = 0 #None
+        self.self_position_theta = None
         rospy.Subscriber("robot1/lidar/rawdata", LaserScan, self.getLidarDataCallback)
         self.lidar_ranges = None #length in meter between lidar and touched object 
         self.lidar_intensities = None 
@@ -56,11 +56,6 @@ class LidarNode:
                 
                 #Publish
                 self.otherRobotsPos_pub.publish(self.getPositionOfOtherRobotsMsg())
-
-                #Force current position reset
-                #self.self_position_x = None
-                #self.self_position_y = None 
-                #self.self_position_theta = None 
             
             rate.sleep() #wait according to publish rate
 
