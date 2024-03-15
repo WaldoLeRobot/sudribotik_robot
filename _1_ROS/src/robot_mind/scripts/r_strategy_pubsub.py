@@ -64,11 +64,9 @@ class RStrategyNode:
         fpid.set_MAX_E_INTEGRALLE_BRAKE("000500", self.serial_asserv)
 
         #Set position
-        self.openSerialConnection() #open serial
         print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Début callage...")
         fcalage.Callage_All(self.serial_asserv)
         print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Fin callage...")
-        self.serial_asserv.close()  #close serial
 
         #Publish self position timer callback
         rospy.Timer(rospy.Duration(1.0/20.0), self.publishSelfPosition) #publish at a 20hz rate
@@ -78,7 +76,7 @@ class RStrategyNode:
         """
         Open serial connection between this raspberry and the asserv card.
         """
-        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Ouverture uart...")
+
         serial_port = '/dev/ttyUSB0'
         Baudrate=1000000    
         ttl9600=False
@@ -101,16 +99,11 @@ class RStrategyNode:
         #Set publish rate
         rate = rospy.Rate(10) #in hz    
 
-        while not rospy.is_shutdown():
+        while not rospy.is_shutdown() and self.serial_asserv:
             
             #Actions
-            self.openSerialConnection()
-            fdd.cibler("1500","1000", "100", self.serial_asserv)  
-            self.serial_asserv.close() #close serial connection
-
-            self.openSerialConnection()
+            fdd.cibler("1500","1000", "100", self.serial_asserv)
             fdd.avancer("0800","100", self.serial_asserv)
-            self.serial_asserv.close() #close serial connection
 
             rate.sleep() #wait according to publish rate
         
@@ -138,14 +131,12 @@ class RStrategyNode:
         Publish self position of the robot on the board.
         """
         self_pos = PositionPx()
-        
-        #Open serial connection
-        self.openSerialConnection()
 
         #Test if serial connection is opened
         if self.serial_asserv :
             try:
                 ret_selfpos = fcalage.get_pos(self.serial_asserv)
+                print(ret_selfpos[0])
                 
                 self_pos.x = int(float(ret_selfpos[0]))
                 self_pos.y = int(float(ret_selfpos[1]))
@@ -157,10 +148,7 @@ class RStrategyNode:
                 pass
 
             #Close serial connection
-            self.serial_asserv.close()
-            
-        #Publish self postition
-        self.robotPos_pub.publish(self_pos)
+            self.robotPos_pub.publish(self_pos)
 
 
 
