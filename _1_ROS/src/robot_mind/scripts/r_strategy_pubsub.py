@@ -64,8 +64,9 @@ class RStrategyNode:
         fpid.set_MAX_E_INTEGRALLE_BRAKE("000500", self.serial_asserv)
 
         #Set position
-        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Définitition de la position...")
-        fcalage.set_pos("2500", "0500", "090", self.serial_asserv)
+        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Début callage...")
+        fcalage.Callage_All(self.serial_asserv)
+        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Fin callage...")
 
         #Publish self position timer callback
         rospy.Timer(rospy.Duration(1.0/20.0), self.publishSelfPosition) #publish at a 20hz rate
@@ -123,7 +124,7 @@ class RStrategyNode:
     
 
 
-    def publishSelfPosition(self):
+    def publishSelfPosition(self, time_event):
         """
         Publish self position of the robot on the board.
         """

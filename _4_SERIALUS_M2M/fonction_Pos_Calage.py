@@ -41,7 +41,7 @@ def set_pos(x,y,t,ser):
     reponse = s.Envoi_reponse(code_function + x + y+t, ser)
     return reponse[1]
 
-def Callage_All(distance, vitesse, ser):
+def Callage_All(ser):
     """
     Fonction pour envoyer une commande pour avancer le robot.
 
@@ -55,14 +55,6 @@ def Callage_All(distance, vitesse, ser):
             - Réponse du robot
     """
     code_function = '120'
-    if len(distance) != 4:
-        return False
-    else:
-        d = distance
-    if len(vitesse) != 3:
-        return False
-    else:
-        v = vitesse
     reponse = s.Envoi_reponse(code_function + d + v, ser)
     return reponse[1]
 
