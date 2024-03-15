@@ -74,12 +74,7 @@ class RStrategyNode:
     def setSerialConnection(self):
         """
         Set serial connection between this raspberry and the asserv card.
-        """
-
-        #Set free access to tty directories to everyone (NOT SAFE AT ALL BUT EZ TO DO)
-       passw_bytes = self.config["WHO_AM_I"][2].encode()
-       subprocess.run(["sudo", "chmod", "777", "/dev/tty*"], stdin=password_stdin.stdout.decode("ascii"), stdout=subprocess.PIPE)
-    
+        """    
         serial_port = '/dev/ttyUSB0'
         Baudrate=1000000    
         ttl9600=False
