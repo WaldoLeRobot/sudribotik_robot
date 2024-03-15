@@ -44,7 +44,7 @@ class RStrategyNode:
         self.other_robots_pos = None
 
         #This node will publish to these topics
-        self.robotPos_pub = rospy.Publisher("robot1/position/self", ArrayPositionPxRectangle, queue_size=10)
+        self.robotPos_pub = rospy.Publisher("robot1/position/self", PositionPx, queue_size=10)
         self.score_pub = rospy.Publisher("robot1/score", Score, queue_size=10)
         self.score = Score() #score initialized to 0
         self.score.score = 0
@@ -132,13 +132,17 @@ class RStrategyNode:
         
         #Test if serial connection is already initialized
         if self.serial_asserv :
-            ret_selfpos = fcalage.get_pos(self.serial_asserv)
-            self_pos.x = int(float(ret_selfpos[0]))
-            self_pos.y = int(float(ret_selfpos[1]))
+            try:
+                ret_selfpos = fcalage.get_pos(self.serial_asserv)
+                
+                self_pos.x = int(float(ret_selfpos[0]))
+                self_pos.y = int(float(ret_selfpos[1]))
 
-            #Convert theta from range [0; 360] to [0;2pi]
-            self_pos.theta = (float(ret_selfpos[0]))/180*math.pi
-
+                #Convert theta from range [0; 360] to [0;2pi]
+                self_pos.theta = (float(ret_selfpos[0]))/180*math.pi
+             
+            except:
+                pass
         #Publish self postition
         self.robotPos_pub.publish(self_pos)
 
