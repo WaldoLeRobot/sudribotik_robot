@@ -52,7 +52,7 @@ class RStrategyNode:
         #Establish serial connection
         self.serial_asserv = None
         while not self.serial_asserv:
-             self.serial_asserv = self.setSerialConnection()
+            self.openSerialConnection()
 
         #Set PID parameters
         print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Définitition du pid...")
@@ -64,18 +64,21 @@ class RStrategyNode:
         fpid.set_MAX_E_INTEGRALLE_BRAKE("000500", self.serial_asserv)
 
         #Set position
+        self.openSerialConnection() #open serial
         print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Début callage...")
         fcalage.Callage_All(self.serial_asserv)
         print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Fin callage...")
+        self.serial_asserv.close()  #close serial
 
         #Publish self position timer callback
         rospy.Timer(rospy.Duration(1.0/20.0), self.publishSelfPosition) #publish at a 20hz rate
 
 
-    def setSerialConnection(self):
+    def openSerialConnection(self):
         """
-        Set serial connection between this raspberry and the asserv card.
-        """    
+        Open serial connection between this raspberry and the asserv card.
+        """
+        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Ouverture uart...")
         serial_port = '/dev/ttyUSB0'
         Baudrate=1000000    
         ttl9600=False
@@ -89,7 +92,7 @@ class RStrategyNode:
                   f"sur le port {serial_port} ?")
             serial = None
 
-        return serial
+        self.serial_asserv = serial
 
     def run(self):
         """
@@ -100,9 +103,15 @@ class RStrategyNode:
 
         while not rospy.is_shutdown():
             
-            #Publish    
-            fdd.cibler("1500","1000", "100", self.serial_asserv)    
+            #Actions
+            self.openSerialConnection()
+            fdd.cibler("1500","1000", "100", self.serial_asserv)  
+            self.serial_asserv.close() #close serial connection
+
+            self.openSerialConnection()
             fdd.avancer("0800","100", self.serial_asserv)
+            self.serial_asserv.close() #close serial connection
+
             rate.sleep() #wait according to publish rate
         
         #Close serial connection
@@ -130,7 +139,10 @@ class RStrategyNode:
         """
         self_pos = PositionPx()
         
-        #Test if serial connection is already initialized
+        #Open serial connection
+        self.openSerialConnection()
+
+        #Test if serial connection is opened
         if self.serial_asserv :
             try:
                 ret_selfpos = fcalage.get_pos(self.serial_asserv)
@@ -143,6 +155,10 @@ class RStrategyNode:
              
             except:
                 pass
+
+            #Close serial connection
+            self.serial_asserv.close()
+            
         #Publish self postition
         self.robotPos_pub.publish(self_pos)
 
@@ -156,6 +172,3 @@ if __name__ == '__main__':
     print("START STRATEGY")
     strategy = RStrategyNode()#instantiate it
     strategy.run()
-    #except Exception as e:
-        #traceback.print_exc()
-        #print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {e}")
