@@ -140,7 +140,7 @@ class RStrategyNode:
             self_pos.theta = (float(ret_selfpos[0]))/180*math.pi
 
         #Publish self postition
-        self.robotPos_pub.pusblish(self_pos)
+        self.robotPos_pub.publish(self_pos)
 
 
 

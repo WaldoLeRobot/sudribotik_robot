@@ -55,7 +55,7 @@ def Callage_All(ser):
             - Réponse du robot
     """
     code_function = '120'
-    reponse = s.Envoi_reponse(code_function + d + v, ser)
+    reponse = s.Envoi_reponse(code_function, ser)
     return reponse[1]
 
 """   
