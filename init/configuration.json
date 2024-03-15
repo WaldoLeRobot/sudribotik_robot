@@ -1,7 +1,7 @@
 {
 	"_this_is_a_comment": "Make sure to put EVERYTHING in a list",
 
-    "WHO_AM_I": ["Waldo", "BLUE"],
+    "WHO_AM_I": ["Waldo", "BLUE", "Grab2Pots"],
 
     "BLUE_ROBOT_FINISH_TARGETS": [[250, 1800], [2800, 100]],
 
