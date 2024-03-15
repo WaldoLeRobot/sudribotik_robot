@@ -79,7 +79,7 @@ class RStrategyNode:
         #Set free access to tty directories to everyone (NOT SAFE AT ALL BUT EZ TO DO)
         password_stdin = subprocess.run(["echo", self.config["WHO_AM_I"][2]], stdout=subprocess.PIPE)
         subprocess.run(["sudo", "chmod", "777", "/dev/tty*"], stdin=password_stdin.stdout, stdout=subprocess.PIPE)
-        exit(0)
+    
         serial_port = '/dev/ttyUSB0'
         Baudrate=1000000    
         ttl9600=False
@@ -105,8 +105,8 @@ class RStrategyNode:
         while not rospy.is_shutdown():
             
             #Publish    
-            fdd.orienter("100","100", self.serial_asserv)    
-            fdd.avancer("100","100", self.serial_asserv)
+            fdd.cibler("1500","1000", "100", self.serial_asserv)    
+            fdd.avancer("0800","100", self.serial_asserv)
             rate.sleep() #wait according to publish rate
         
         #Close serial connection
