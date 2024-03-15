@@ -3,17 +3,23 @@ import os
 import sys
 import rospy
 import traceback
-from beacon_msgs.msg import ArrayPositionPx, ArrayPositionPxWithType, ArrayPositionPxRectangle, PositionPx
+import subprocess
+import math
+import json
+from beacon_msgs.msg import ArrayPositionPx, ArrayPositionPxRectangle, PositionPx, Score
 
 FILE_PATH = os.path.abspath(__file__)
 FILE_NAME = os.path.basename(FILE_PATH)
 
-#sys.path.insert(1, FILE_PATH.split("_1_ROS")[0]) #add parent folder to python path
 sys.path.insert(1, FILE_PATH.split("_1_ROS")[0] + "_4_SERIALUS_M2M/") #add SerialusM2M path
 import serialusM2M as serialus
 import fonction_deplacement as fdd
 import fonction_Pos_Calage as fcalage
 import fonction_PID as fpid
+
+configuration_FILEPATH = FILE_PATH.split("_1_ROS")[0]+"init/configuration.json"
+
+
     
 class RStrategyNode:
     """
@@ -21,7 +27,11 @@ class RStrategyNode:
     """
     
     
-    def __init__(self):        
+    def __init__(self):
+
+        #Get configs    
+        with open (configuration_FILEPATH, "r") as f:
+            self.config = json.load(f)
     
         #Initialize  and tell node name to rospy
         rospy.init_node('r_strategy', anonymous=True)
@@ -35,6 +45,9 @@ class RStrategyNode:
 
         #This node will publish to these topics
         self.robotPos_pub = rospy.Publisher("robot1/position/self", ArrayPositionPxRectangle, queue_size=10)
+        self.score_pub = rospy.Publisher("robot1/score", Score, queue_size=10)
+        self.score = Score() #score initialized to 0
+        self.score.score = 0
 
         #Establish serial connection
         self.serial_asserv = None
@@ -54,11 +67,19 @@ class RStrategyNode:
         print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Définitition de la position...")
         fcalage.set_pos("2500", "0500", "090", self.serial_asserv)
 
+        #Publish self position timer callback
+        rospy.Timer(rospy.Duration(1.0/20.0), self.publishSelfPosition) #publish at a 20hz rate
+
 
     def setSerialConnection(self):
         """
         Set serial connection between this raspberry and the asserv card.
         """
+
+        #Set free access to tty directories to everyone (NOT SAFE AT ALL BUT EZ TO DO)
+        password_stdin = subprocess.run(["echo", self.config["WHO_AM_I"][2]], stdout=subprocess.PIPE)
+        subprocess.run(["sudo", "chmod", "777", "/dev/tty*"], stdin=password_stdin.stdout, stdout=subprocess.PIPE)
+        exit(0)
         serial_port = '/dev/ttyUSB0'
         Baudrate=1000000    
         ttl9600=False
@@ -79,14 +100,13 @@ class RStrategyNode:
         OPERATE HERE, ALL ACTIONS MUST BE WROTE IN THE WHILE LOOP OF THIS FUNCTION
         """
         #Set publish rate
-        rate = rospy.Rate(10) #in hz        
+        rate = rospy.Rate(10) #in hz    
 
         while not rospy.is_shutdown():
             
-            #Publish
-            self.robotPos_pub.publish(self.getSelfPosition())
-            print(fdd.orienter("100","100", self.serial_asserv))
-            exit(0)
+            #Publish    
+            fdd.orienter("100","100", self.serial_asserv)    
+            fdd.avancer("100","100", self.serial_asserv)
             rate.sleep() #wait according to publish rate
         
         #Close serial connection
@@ -108,22 +128,23 @@ class RStrategyNode:
     
 
 
-    def getSelfPosition(self):
+    def publishSelfPosition(self):
         """
-        Create message containing self position on the board.
+        Publish self position of the robot on the board.
         """
         self_pos = PositionPx()
         
         #Test if serial connection is already initialized
         if self.serial_asserv :
             ret_selfpos = fcalage.get_pos(self.serial_asserv)
-            self_pos.x = int(ret_selfpos[0])
-            self_pos.y = int(ret_selfpos[1])
-            self_pos.theta = 0
+            self_pos.x = int(float(ret_selfpos[0]))
+            self_pos.y = int(float(ret_selfpos[1]))
 
-            return self_pos
+            #Convert theta from range [0; 360] to [0;2pi]
+            self_pos.theta = (float(ret_selfpos[0]))/180*math.pi
 
-        return None
+        #Publish self postition
+        self.robotPos_pub.pusblish(self_pos)
 
 
 

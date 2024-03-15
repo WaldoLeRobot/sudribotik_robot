@@ -67,9 +67,7 @@ class LidarNode:
         """
         self.self_position_x = data.x #in milimeter
         self.self_position_y = data.y
-
-        #Convert theta from range [0; 360] to [0;2pi]
-        self.self_position_theta = data.theta/180*math.pi
+        self.self_position_theta = data.theta #[0;2pi]
 
 
     def getLidarDataCallback(self, data):
