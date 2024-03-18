@@ -3,7 +3,7 @@ import numpy as np
 import math
 import os
 import rospy
-import sys
+import json
 import traceback
 from sensor_msgs.msg import LaserScan
 from beacon_msgs.msg import ArrayPositionPx, PositionPx, ArrayPositionPxRectangle
@@ -21,6 +21,11 @@ class LidarNode:
     """
 
     def __init__(self):
+
+        #Get configuration file
+        configuration_FILEPATH = FILE_PATH.split("_1_ROS")[0]+"init/configuration.json"
+        with open (configuration_FILEPATH, "r") as f:
+            self.config = json.load(f)
 
         #Constants board values
         self.BOARD_WIDTH_IN_METER = 3
@@ -106,6 +111,13 @@ class LidarNode:
         theta_relative = (theta_robot + (index*angle_increment)) % (2*math.pi) #angle of the laser relative to the board
         quadrant = math.ceil(theta_relative/(math.pi/2)+0.000000000000000000000001) #in case theta_relative=0 we add a tiny float number 
         
+        #Change quadrant if the robot is YELLOW
+        if self.config["WHO_AM_I"][1] == "YELLOW":
+            if quadrant == 1 : quadrant = 3
+            elif quadrant == 2 : quadrant = 4
+            elif quadrant == 3 : quadrant = 1
+            elif quadrant == 4 : quadrant = 2
+
         #Get values to compare x and y projection of the range
         if   quadrant == 1 :
             max_x_inside = self.BOARD_WIDTH_IN_METER - x_robot

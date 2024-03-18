@@ -89,7 +89,7 @@ class RStrategyNode:
             print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Avez-vous bien branché la carte d'asservissement "+\
                   f"sur le port {serial_port} ?")
             serial = None
-
+  
         self.serial_asserv = serial
 
     def run(self):
