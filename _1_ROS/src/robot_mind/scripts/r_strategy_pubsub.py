@@ -103,7 +103,6 @@ class RStrategyNode:
             
             #Actions
             print(f"pos_objet:{self.other_robots_pos}")
-            fdd.avancer("0800","100", self.serial_asserv)
 
             rate.sleep() #wait according to publish rate
         
