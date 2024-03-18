@@ -121,7 +121,14 @@ class RStrategyNode:
         Callback for position of other robots detectd and calculated by the lidar node.
         """
         self.other_robots_pos = data.array_of_positionspx
-    
+        
+        #Print position of other detected object for debug purpose
+        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Il y a {len(self.other_robots_pos)} sur le plateau.")
+        for k,ovni in enumerate(self.other_robots_pos):
+            print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {k+1}:\tx: {self.other_robots_pos.x}\n\ty: {self.other_robots_pos.y}\n")
+
+
+
 
 
     def publishSelfPosition(self, time_event):
@@ -148,16 +155,7 @@ class RStrategyNode:
 
         #Publish
         self.robotPos_pub.publish(self_pos)
-        self.other_robots_pos = []
-        self.other_robots_pos = self_pos #save info for this node
         
-        #Print position of other detected object for debug purpose
-        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Il y a {len(self.other_robots_pos)} sur le plateau.")
-        for k,ovni in enumerate(self.other_robots_pos):
-            print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {k+1}:\tx: {self.other_robots_pos.x}\n\ty: {self.other_robots_pos.y}\n")
-
-
-
 
 
 if __name__ == '__main__':
