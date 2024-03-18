@@ -105,12 +105,13 @@ class LidarNode:
 
         #Filter nan values
         if not range :
+            print("no\n")
             return False, (None, None), None
         
         #Find laser quadrant
         theta_relative = (theta_robot + (index*angle_increment)) % (2*math.pi) #angle of the laser relative to the board
         quadrant = math.ceil(theta_relative/(math.pi/2)+0.000000000000000000000001) #in case theta_relative=0 we add a tiny float number 
-        print(quadrant)
+        
         #Get values to compare x and y projection of the range
         if   quadrant == 1 :
             max_x_inside = self.BOARD_WIDTH_IN_METER - x_robot
@@ -172,6 +173,7 @@ class LidarNode:
         lidar_ranges_on_board_position = [] #this will contain ranges position, it will follow the index list
         lidar_ranges_on_board_quadrant = [] #this will contain quadrant of laser, it will follow the index list
         for index, range in enumerate(current_lidar_ranges) :
+            print(index, range)
             
             #Get position of ranges inside the board
             is_inside, pos, quadrant = self.isRangeOnBoard(index, range, current_lidar_angle_increment, current_robot_x, current_robot_y, current_robot_theta)
