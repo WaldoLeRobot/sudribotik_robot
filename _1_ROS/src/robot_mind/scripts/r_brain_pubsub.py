@@ -91,6 +91,7 @@ class RBrainNode:
 if __name__ == '__main__':
     #Launch the node
     try:
+        databaseManager.init_database_beacon()
         brain = RBrainNode()#instantiate it
         brain.run()
     except Exception as e:
