@@ -66,10 +66,10 @@ class RStrategyNode:
         #Set position
         print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Début callage...")
         fcalage.Callage_All(self.serial_asserv)
-        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Fin callage...")
+        fcalage.set_pos("0420", "0350", "000", self.serial_asserv)
 
         #Publish self position timer callback
-        rospy.Timer(rospy.Duration(1.0/20.0), self.publishSelfPosition) #publish at a 20hz rate
+        rospy.Timer(rospy.Duration(1.0/10.0), self.publishSelfPosition) #publish at a 20hz rate
 
 
     def openSerialConnection(self):
