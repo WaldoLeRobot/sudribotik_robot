@@ -65,11 +65,11 @@ class LidarNode:
         """
         Callback for self position.
         """
-        print(f"\n-----------------------------------"+
+        print(f"\n-----------------------------------\n"+
               f"Log [{os.times().elapsed}] - {FILE_NAME}"+
               f"\n\tmy x : {data.x}"+
               f"\n\tmy y : {data.y}"+
-              f"\n\tmy thêta : {int(data.theta*180/math.pi)}° (rad:{round(data.theta,2)}\n")
+              f"\n\tmy thêta : {int(data.theta*180/math.pi)}° (rad:{round(data.theta,2)})\n")
         self.self_position_x = data.x #in milimeter
         self.self_position_y = data.y
         self.self_position_theta = data.theta #[0;2pi]
@@ -110,7 +110,7 @@ class LidarNode:
         #Find laser quadrant
         theta_relative = (theta_robot + (index*angle_increment)) % (2*math.pi) #angle of the laser relative to the board
         quadrant = math.ceil(theta_relative/(math.pi/2)+0.000000000000000000000001) #in case theta_relative=0 we add a tiny float number 
-        
+        print(quadrant)
         #Get values to compare x and y projection of the range
         if   quadrant == 1 :
             max_x_inside = self.BOARD_WIDTH_IN_METER - x_robot
