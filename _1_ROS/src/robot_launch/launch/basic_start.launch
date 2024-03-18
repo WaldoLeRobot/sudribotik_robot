@@ -1,6 +1,4 @@
 <launch>
-  <!-- Launch the ROS master -->
-  <node pkg="roscore" type="roscore" name="roscore" output="screen"/>
 
   <!-- Launch the lidar -->
   <include file="$(find ldlidar_stl_ros)/launch/ld06.launch"/>
