@@ -65,7 +65,7 @@ class LidarNode:
         """
         Callback for self position.
         """
-        print(data.x)
+        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {data}")
         self.self_position_x = data.x #in milimeter
         self.self_position_y = data.y
         self.self_position_theta = data.theta #[0;2pi]
@@ -124,7 +124,7 @@ class LidarNode:
             max_x_inside = self.BOARD_WIDTH_IN_METER - x_robot
             max_y_inside = self.BOARD_HEIGHT_IN_METER - y_robot
         else:
-            print(f"quadrant:{quadrant}\ntheta_robot:{theta_robot}\nindex:{index}\nangle_increment:{angle_increment}\ntheta_relative:{theta_relative}")
+            print(f"Log [{os.times().elapsed}] - {FILE_NAME} :  Erreur de quadrant.\nquadrant:{quadrant}\ntheta_robot:{theta_robot}\nindex:{index}\nangle_increment:{angle_increment}\ntheta_relative:{theta_relative}")
         #Project the range on the x and y axes
         x_projection = abs(range * math.cos(theta_relative))
         y_projection = abs(range * math.sin(theta_relative))         
@@ -188,7 +188,6 @@ class LidarNode:
         previous_index = None
         middle_index_list = [] #this will store the index of position of other robots
         temp_list = [] #this will store a list of following index
-        a=None
         for idx,range_index in enumerate(lidar_ranges_on_board_index):
             
             #The first index is always took 
