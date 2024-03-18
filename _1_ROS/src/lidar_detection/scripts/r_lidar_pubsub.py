@@ -105,7 +105,6 @@ class LidarNode:
 
         #Filter nan values
         if not range :
-            print("no\n")
             return False, (None, None), None
         
         #Find laser quadrant
@@ -173,7 +172,6 @@ class LidarNode:
         lidar_ranges_on_board_position = [] #this will contain ranges position, it will follow the index list
         lidar_ranges_on_board_quadrant = [] #this will contain quadrant of laser, it will follow the index list
         for index, range in enumerate(current_lidar_ranges) :
-            print(index, range)
             
             #Get position of ranges inside the board
             is_inside, pos, quadrant = self.isRangeOnBoard(index, range, current_lidar_angle_increment, current_robot_x, current_robot_y, current_robot_theta)

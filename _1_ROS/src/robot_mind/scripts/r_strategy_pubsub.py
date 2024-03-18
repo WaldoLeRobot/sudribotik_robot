@@ -69,7 +69,7 @@ class RStrategyNode:
         fcalage.set_pos("0420", "0350", "000", self.serial_asserv)
 
         #Publish self position timer callback
-        rospy.Timer(rospy.Duration(1.0/10.0), self.publishSelfPosition) #publish at a 20hz rate
+        #rospy.Timer(rospy.Duration(1.0/10.0), self.publishSelfPosition) #publish at a 10hz rate
 
 
     def openSerialConnection(self):
@@ -102,6 +102,7 @@ class RStrategyNode:
         while not rospy.is_shutdown() and self.serial_asserv:
             
             #Actions
+            self.publishSelfPosition()
 
             rate.sleep() #wait according to publish rate
         
@@ -133,7 +134,7 @@ class RStrategyNode:
 
 
 
-    def publishSelfPosition(self, time_event):
+    def publishSelfPosition(self, time_event=None):
         """
         Publish self position of the robot on the board.
         """
