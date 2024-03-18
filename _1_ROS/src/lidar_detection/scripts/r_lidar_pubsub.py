@@ -31,9 +31,9 @@ class LidarNode:
 
         #This node will listen to these topics
         rospy.Subscriber("robot1/position/self", PositionPx, self.getSelfPositionCallback)
-        self.self_position_x = 420 #attributes saving self position in mm
-        self.self_position_y = 350 
-        self.self_position_theta = 0
+        self.self_position_x = None #attributes saving self position in mm
+        self.self_position_y = None 
+        self.self_position_theta = None
         
         rospy.Subscriber("robot1/lidar/rawdata", LaserScan, self.getLidarDataCallback)
         self.lidar_ranges = None #length in meter between lidar and touched object 
