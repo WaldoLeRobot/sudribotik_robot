@@ -145,11 +145,11 @@ class RStrategyNode:
             try:
                 ret_selfpos = fcalage.get_pos(self.serial_asserv)
                 
-                self_pos.x = 420#int(float(ret_selfpos[0]))
-                self_pos.y = 350#int(float(ret_selfpos[1]))
+                self_pos.x = int(float(ret_selfpos[0]))
+                self_pos.y = int(float(ret_selfpos[1]))
 
                 #Convert theta from range [0; 360] to [0;2pi]
-                self_pos.theta = 0#(float(ret_selfpos[2]))/180*math.pi
+                self_pos.theta = float(ret_selfpos[2])/180*math.pi
                 
              
             except:

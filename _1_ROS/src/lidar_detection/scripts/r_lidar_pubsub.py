@@ -31,9 +31,9 @@ class LidarNode:
 
         #This node will listen to these topics
         rospy.Subscriber("robot1/position/self", PositionPx, self.getSelfPositionCallback)
-        self.self_position_x = 420 #attributes saving self position in mm
-        self.self_position_y = 350 
-        self.self_position_theta = 0
+        self.self_position_x = None #attributes saving self position in mm
+        self.self_position_y = None 
+        self.self_position_theta = None
         
         rospy.Subscriber("robot1/lidar/rawdata", LaserScan, self.getLidarDataCallback)
         self.lidar_ranges = None #length in meter between lidar and touched object 
@@ -65,11 +65,6 @@ class LidarNode:
         """
         Callback for self position.
         """
-        print(f"\n-----------------------------------\n"+
-              f"Log [{os.times().elapsed}] - {FILE_NAME}"+
-              f"\n\tmy x : {data.x}"+
-              f"\n\tmy y : {data.y}"+
-              f"\n\tmy thêta : {int(data.theta*180/math.pi)}° (rad:{round(data.theta,2)})\n")
         self.self_position_x = data.x #in milimeter
         self.self_position_y = data.y
         self.self_position_theta = data.theta #[0;2pi]
@@ -181,7 +176,7 @@ class LidarNode:
                 lidar_ranges_on_board_position.append(pos) #store position
                 lidar_ranges_on_board_quadrant.append(quadrant) #store quadrant
 
-        print(lidar_ranges_on_board_index)
+     
         #Regroup each range with close index then take the middle one     
                            
         #This constant set the maximum number of index missing between two index
