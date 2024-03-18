@@ -65,7 +65,7 @@ class RStrategyNode:
 
         #Set position
         print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Début callage...")
-        fcalage.Callage_All(self.serial_asserv)
+        #fcalage.Callage_All(self.serial_asserv)
         fcalage.set_pos("0420", "0350", "000", self.serial_asserv)
 
         #Publish self position timer callback
@@ -123,7 +123,7 @@ class RStrategyNode:
         self.other_robots_pos = data.array_of_positionspx
         
         #Print position of other detected object for debug purpose
-        print(f"\n-----------------------------------"+
+        print(f"\n-----------------------------------\n"+
               f"Log [{os.times().elapsed}] - {FILE_NAME}"+
               f"\nIl y a {len(self.other_robots_pos)} objet(s) sur le plateau.")
         for k,ovni in enumerate(self.other_robots_pos):

@@ -69,7 +69,7 @@ class LidarNode:
               f"Log [{os.times().elapsed}] - {FILE_NAME}"+
               f"\n\tmy x : {data.x}"+
               f"\n\tmy y : {data.y}"+
-              f"\n\tmy thêta : {data.theta*180/math.pi}°\n")
+              f"\n\tmy thêta : {int(data.theta*180/math.pi)}° (rad:{round(data.theta,2)}\n")
         self.self_position_x = data.x #in milimeter
         self.self_position_y = data.y
         self.self_position_theta = data.theta #[0;2pi]
