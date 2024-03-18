@@ -181,7 +181,7 @@ class LidarNode:
                 lidar_ranges_on_board_position.append(pos) #store position
                 lidar_ranges_on_board_quadrant.append(quadrant) #store quadrant
 
-     
+        print(lidar_ranges_on_board_index)
         #Regroup each range with close index then take the middle one     
                            
         #This constant set the maximum number of index missing between two index
