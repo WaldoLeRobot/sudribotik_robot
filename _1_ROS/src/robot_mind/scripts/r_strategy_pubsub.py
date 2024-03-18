@@ -123,9 +123,11 @@ class RStrategyNode:
         self.other_robots_pos = data.array_of_positionspx
         
         #Print position of other detected object for debug purpose
-        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Il y a {len(self.other_robots_pos)} objet(s) sur le plateau.")
+        print(f"\n-----------------------------------"+
+              f"Log [{os.times().elapsed}] - {FILE_NAME}"+
+              f"\nIl y a {len(self.other_robots_pos)} objet(s) sur le plateau.")
         for k,ovni in enumerate(self.other_robots_pos):
-            print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {k+1}:\tx: {ovni.x}\n\ty: {ovni.y}\n")
+            print(f"\tObjet {k+1}:\n\tx: {ovni.x}\n\ty: {ovni.y}\n")
 
 
 

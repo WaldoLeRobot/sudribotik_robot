@@ -65,7 +65,11 @@ class LidarNode:
         """
         Callback for self position.
         """
-        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {data}")
+        print(f"\n-----------------------------------"+
+              f"Log [{os.times().elapsed}] - {FILE_NAME}"+
+              f"\n\tmy x : {data.x}"+
+              f"\n\tmy y : {data.y}"+
+              f"\n\tmy thêta : {data.theta}\n")
         self.self_position_x = data.x #in milimeter
         self.self_position_y = data.y
         self.self_position_theta = data.theta #[0;2pi]
