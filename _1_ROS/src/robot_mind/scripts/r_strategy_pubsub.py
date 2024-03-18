@@ -102,7 +102,6 @@ class RStrategyNode:
         while not rospy.is_shutdown() and self.serial_asserv:
             
             #Actions
-            print(f"Log [{os.times().elapsed}] - {FILE_NAME} : pos_objet:{self.other_robots_pos}")
 
             rate.sleep() #wait according to publish rate
         
@@ -147,8 +146,16 @@ class RStrategyNode:
                 self_pos = PositionPx() #reinitialize the pos so we dont publish partial information
                 print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Impossible de publish une position.")
 
+        #Publish
         self.robotPos_pub.publish(self_pos)
-        print(self_pos)
+        self.other_robots_pos = []
+        self.other_robots_pos = self_pos #save info for this node
+        
+        #Print position of other detected object for debug purpose
+        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Il y a {len(self.other_robots_pos)} sur le plateau.")
+        for k,ovni in enumerate(self.other_robots_pos):
+            print(f"Log [{os.times().elapsed}] - {FILE_NAME} : {k+1}:\tx: {self.other_robots_pos.x}\n\ty: {self.other_robots_pos.y}\n")
+
 
 
 
