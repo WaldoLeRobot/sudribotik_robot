@@ -65,6 +65,7 @@ class LidarNode:
         """
         Callback for self position.
         """
+        print(data.x)
         self.self_position_x = data.x #in milimeter
         self.self_position_y = data.y
         self.self_position_theta = data.theta #[0;2pi]

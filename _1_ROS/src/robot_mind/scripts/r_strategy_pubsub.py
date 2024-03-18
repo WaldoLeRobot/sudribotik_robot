@@ -102,7 +102,7 @@ class RStrategyNode:
         while not rospy.is_shutdown() and self.serial_asserv:
             
             #Actions
-            print(f"pos_objet:{self.other_robots_pos}")
+            print(f"Log [{os.times().elapsed}] - {FILE_NAME} : pos_objet:{self.other_robots_pos}")
 
             rate.sleep() #wait according to publish rate
         
@@ -135,24 +135,20 @@ class RStrategyNode:
         if self.serial_asserv :
             try:
                 ret_selfpos = fcalage.get_pos(self.serial_asserv)
-                print(f"\n\nuart:{ret_selfpos}")
                 
                 self_pos.x = int(float(ret_selfpos[0]))
                 self_pos.y = int(float(ret_selfpos[1]))
 
                 #Convert theta from range [0; 360] to [0;2pi]
                 self_pos.theta = (float(ret_selfpos[2]))/180*math.pi
-                print(f"x:{self_pos.x}\ny:{self_pos.y}\ntheta:{self_pos.theta}")
                 
              
             except:
                 self_pos = PositionPx() #reinitialize the pos so we dont publish partial information
                 print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Impossible de publish une position.")
 
-            #Close serial connection
-            self.robotPos_pub.publish(self_pos)
-
-
+        self.robotPos_pub.publish(self_pos)
+        print(self_pos)
 
 
 
