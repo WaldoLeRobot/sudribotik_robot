@@ -56,8 +56,8 @@ class RStrategyNode:
 
         #Set PID parameters
         print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Définitition du pid...")
-        fpid.set_ENTRAXE_MM("033600", self.serial_asserv)
-        fpid.set_PERIMETRE_ROUE_MM("021000", self.serial_asserv)
+        fpid.set_ENTRAXE_MM("023500", self.serial_asserv)
+        fpid.set_DIAMETRE_ROUE_CODEUSE("044000", self.serial_asserv)
         fpid.set_PID_VITESSE_DIST("06500", "05500", "99000", self.serial_asserv)
         fpid.set_PID_BREAK("01250", "00600","20000", self.serial_asserv)
         fpid.set_MAX_ERREUR_INTEGRALLE_V("045000", self.serial_asserv)
