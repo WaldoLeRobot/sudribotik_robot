@@ -65,8 +65,7 @@ class RStrategyNode:
 
         #Set position
         print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Début callage...")
-        #fcalage.Callage_All(self.serial_asserv)
-        fcalage.set_pos("0150", "0450", "000", self.serial_asserv)
+        fcalage.Callage_All(self.serial_asserv)
 
         #Publish self position timer callback
         #rospy.Timer(rospy.Duration(1.0/10.0), self.publishSelfPosition) #publish at a 10hz rate
@@ -102,7 +101,7 @@ class RStrategyNode:
         while not rospy.is_shutdown() and self.serial_asserv:
             
             #Actions
-            fdd.avancer("0100","100", self.serial_asserv)
+            #fdd.avancer("0100","100", self.serial_asserv)
             self.publishSelfPosition()
 
             rate.sleep() #wait according to publish rate
@@ -116,6 +115,7 @@ class RStrategyNode:
         Callback for aruco tags raw position detected by robot front camera.
         """
         self.aruco_pos = data.array_of_rectangles
+        #print(self.aruco_pos.a)
 
 
     def otherRobotsPosFromLidarCallback(self, data):
