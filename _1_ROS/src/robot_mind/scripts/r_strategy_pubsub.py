@@ -13,6 +13,7 @@ FILE_NAME = os.path.basename(FILE_PATH)
 
 sys.path.insert(1, FILE_PATH.split("_1_ROS")[0] + "_4_SERIALUS_M2M/") #add SerialusM2M path
 import serialusM2M as serialus
+import serialusM3M as serialus3
 import fonction_deplacement as fdd
 import fonction_Pos_Calage as fcalage
 import fonction_PID as fpid
@@ -101,8 +102,17 @@ class RStrategyNode:
         while not rospy.is_shutdown() and self.serial_asserv:
             
             #Actions
-            #fdd.avancer("0100","100", self.serial_asserv)
-            self.publishSelfPosition()
+            if abs(self.aruco_pos.a_px.x-self.aruco_pos.b_px.x) <= 39 : #seuil de pixels à fixer empiriquement
+                print("plante hors de portée")
+                #faire qqchose, comme par exemple s'éloigner de la plante en bougeant le robot
+
+            elif abs(self.aruco_pos.a_px.x-self.aruco_pos.b_px.x) >= 52: #seuil de pixels à fixer empiriquement                       
+                print("plante trop proche (ou erreur système)")
+                #faire qqchose, comme par exemple s'éloigner de la plante en bougeant le robot
+            else :
+                print("plante a portée de bras")
+                print(serialus3.AX_set_Pos('08', '0541', '1023', self.serial_asserv))
+                #attraperPlante(x_centreAruco,y_centreAruco)
 
             rate.sleep() #wait according to publish rate
         

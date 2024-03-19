@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Créé le Lun Sep 11 20:30:23 2023(in Bangkok Baby)
-@author: Antoine Jreissati
+Created on Wed Jan 31 14:57:43 2024
+@author: Theophile Baranes, based on Antoine Jreissati's job
 code AX SerialusM2M
 """
 
@@ -21,7 +21,7 @@ def AX_set_ang(ID, Angle, vitesse, ser):
 
     Args:
         ID (str, 2): Identifiant du moteur.
-        Angle (str, 3): Angle de déplacement sur 1024.
+        Angle (str, 3): Angle de déplacement sur 360.
         vitesse (str, 4): Vitesse de déplacement sur 1024.
         ser (serial.Serial): Objet de la connexion série.
 
