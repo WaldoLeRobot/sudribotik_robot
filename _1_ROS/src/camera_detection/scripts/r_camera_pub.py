@@ -25,7 +25,7 @@ def publisher():
     rospy.init_node("r_camera", anonymous=True)
 
     #Set publish rate
-    rate = rospy.Rate(10) #in hz
+    rate = rospy.Rate(1) #in hz
 
     #Open camera for video capturing
     cap = cv2.VideoCapture(0, cv2.CAP_V4L2)

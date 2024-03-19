@@ -114,8 +114,12 @@ class RStrategyNode:
         """
         Callback for aruco tags raw position detected by robot front camera.
         """
-        self.aruco_pos = data.array_of_rectangles
-        #print(self.aruco_pos.a)
+        self.aruco_pos = data.array_of_rectangles[0]
+        print(f"a : {self.aruco_pos.a_px.x}, {self.aruco_pos.a_px.y}\n"+
+              f"b : {self.aruco_pos.b_px.x}, {self.aruco_pos.b_px.y}\n"+
+              f"c : {self.aruco_pos.c_px.x}, {self.aruco_pos.c_px.y}\n"+
+              f"d : {self.aruco_pos.d_px.x}, {self.aruco_pos.d_px.y}\n")
+        print(f"Différence entre a et b en x : {abs(self.aruco_pos.a_px.x-self.aruco_pos.b_px.x)}")
 
 
     def otherRobotsPosFromLidarCallback(self, data):
