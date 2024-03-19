@@ -2,9 +2,8 @@
 import os
 import sys
 import rospy
-import sqlite3
 import traceback
-from beacon_msgs.msg import ArrayPositionPx, ArrayPositionPxWithType, ArrayPositionPxRectangle
+from beacon_msgs.msg import ArrayPositionPx, PositionPx, ArrayPositionPxRectangle, Score
 
 FILE_PATH = os.path.abspath(__file__)
 FILE_NAME = os.path.basename(FILE_PATH)
@@ -25,11 +24,10 @@ class RBrainNode:
         rospy.init_node('r_brain', anonymous=True)
 
         #This node will listen to these topics
-        rospy.Subscriber("robot1/position/aruco", ArrayPositionPxRectangle, self.arucoPosFromRobotCallback)
+        rospy.Subscriber("robot1/position/self", PositionPx, self.robotPosFromOdoCallback)
         rospy.Subscriber("robot1/position/otherRobots", ArrayPositionPx, self.otherRobotsPosFromLidarCallback)
-
-        #This node will publish to these topics
-        self.arucoPos_pub = rospy.Publisher("robot1/mind/aruco", ArrayPositionPxRectangle, queue_size=10)
+        rospy.Subscriber("robot1/position/aruco", ArrayPositionPxRectangle, self.arucoPosFromCameraCallback)
+        rospy.Subscriber("robot1/score", Score, self.scoreCallback)
 
 
     def run(self):
@@ -43,8 +41,39 @@ class RBrainNode:
 
 
 
+    def robotPosFromOdoCallback(self, data):
+        """
+        Callback for robot self position given by odometry.
+        """
 
-    def arucoPosFromRobotCallback(self, data):
+        data_dict = {}
+
+        #Fill the dict with robot self position
+        data_dict["position_x"] = data.x
+        data_dict["position_y"] = data.y
+        data_dict["position_theta"] = data.theta
+
+        #Update database
+        databaseManager.insertData("r_self_robot", data_dict)    
+
+
+    def otherRobotsPosFromLidarCallback(self, data):
+        """
+        Callback for position of other robots detectd and calculated by the lidar node.
+        """
+        
+        #Fill the dict with positions of other robot
+        data_dict = {}
+        for pos in data.array_of_positionspx:
+            data_dict["position_x"] = pos.x
+            data_dict["position_y"] = pos.y
+            data_dict["position_theta"] = pos.theta
+
+            #Update database
+            databaseManager.insertData("r_other_robots", data_dict)
+
+
+    def arucoPosFromCameraCallback(self, data):
         """
         Callback for aruco tags raw position detected by robot front camera.
         """
@@ -68,23 +97,20 @@ class RBrainNode:
         
             #Update database
             databaseManager.insertData("r_aruco", data_dict)
-    
 
 
-    def otherRobotsPosFromLidarCallback(self, data):
+    def scoreCallback(self, data):
         """
-        Callback for position of other robots detectd and calculated by the lidar node.
+        Callback for score points.
         """
-        
-        #Fill the dict with positions of other robot
+
         data_dict = {}
-        for pos in data.array_of_positionspx:
-            data_dict["position_x"] = pos.x
-            data_dict["position_y"] = pos.y
-            data_dict["position_theta"] = pos.theta
 
-            #Update database
-            databaseManager.insertData("r_other_robots", data_dict)
+        #Fill the dict with points
+        data_dict["points"] = data.score
+
+        #Update database
+        databaseManager.insertData("r_score", data_dict)
 
 
 

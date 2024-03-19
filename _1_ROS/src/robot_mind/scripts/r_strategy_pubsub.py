@@ -92,6 +92,7 @@ class RStrategyNode:
             serial = None
   
         self.serial_asserv = serial
+        
 
     def run(self):
         """

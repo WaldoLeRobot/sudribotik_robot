@@ -8,7 +8,7 @@ FILE_PATH = os.path.abspath(__file__)
 FILE_NAME = os.path.basename(FILE_PATH)
 
 sys.path.insert(1, FILE_PATH.split("_1_ROS")[0]) #add parent folder to python path
-from _2_CAMERA import ros_detectAruco, ros_arucoCalc
+from _2_CAMERA import ros_detectAruco
 from beacon_msgs.msg import PositionPx, PositionPxRectangle, ArrayPositionPxRectangle
 
 

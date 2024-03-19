@@ -22,9 +22,11 @@ def init_database_robot():
 
 
     Note:
-        There is currently 6 tables initialized :            
+        There is currently 6 tables initialized :
+                r_self_robot          
                 r_aruco
                 r_other_robots
+                r_score
                 
         You can add more following the gloabl pattern.
     """
@@ -40,6 +42,14 @@ def init_database_robot():
 
         try :
             #Create these tables if they dont exist
+            cursor.execute(''' CREATE TABLE IF NOT EXISTS r_self_robot
+                        (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        position_x INTEGER,
+                        position_y INTEGER,
+                        position_theta REAL
+                        )
+                        ''')
             cursor.execute(''' CREATE TABLE IF NOT EXISTS r_aruco
                         (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,16 +64,18 @@ def init_database_robot():
                         dy INTEGER
                         )
                         ''')
-            connection.commit()
-
-
-            #Create these tables if they dont exist
             cursor.execute(''' CREATE TABLE IF NOT EXISTS r_other_robots
                         (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         position_x INTEGER,
                         position_y INTEGER,
                         position_theta REAL
+                        )
+                        ''')
+            cursor.execute(''' CREATE TABLE IF NOT EXISTS r_score
+                        (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        points INTEGER
                         )
                         ''')
             connection.commit()
