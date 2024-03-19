@@ -17,6 +17,7 @@ import serialusM3M as serialus3
 import fonction_deplacement as fdd
 import fonction_Pos_Calage as fcalage
 import fonction_PID as fpid
+import fonction_AX as fax
 
 configuration_FILEPATH = FILE_PATH.split("_1_ROS")[0]+"init/configuration.json"
 
@@ -111,7 +112,7 @@ class RStrategyNode:
                 #faire qqchose, comme par exemple s'éloigner de la plante en bougeant le robot
             else :
                 print("plante a portée de bras")
-                print(serialus3.AX_set_Pos('08', '0541', '1023', self.serial_asserv))
+                print(fax.AX_set_Pos('08', '0541', '1023', self.serial_asserv))
                 #attraperPlante(x_centreAruco,y_centreAruco)
 
             rate.sleep() #wait according to publish rate
