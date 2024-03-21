@@ -56,15 +56,6 @@ class RStrategyNode:
         while not self.serial_asserv:
             self.openSerialConnection()
 
-        #Set PID parameters
-        print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Définitition du pid...")
-        fpid.set_ENTRAXE_MM("023500", self.serial_asserv)
-        fpid.set_DIAMETRE_ROUE_CODEUSE("044000", self.serial_asserv)
-        fpid.set_PID_VITESSE_DIST("06500", "05500", "99000", self.serial_asserv)
-        fpid.set_PID_BREAK("01250", "00600","20000", self.serial_asserv)
-        fpid.set_MAX_ERREUR_INTEGRALLE_V("045000", self.serial_asserv)
-        fpid.set_MAX_E_INTEGRALLE_BRAKE("000500", self.serial_asserv)
-
         #Set position
         print(f"Log [{os.times().elapsed}] - {FILE_NAME} : Début callage...")
         fcalage.Callage_All(self.serial_asserv)
@@ -101,20 +92,9 @@ class RStrategyNode:
         rate = rospy.Rate(10) #in hz    
 
         while not rospy.is_shutdown() and self.serial_asserv:
-            
-            #Actions
-            if abs(self.aruco_pos.a_px.x-self.aruco_pos.b_px.x) <= 39 : #seuil de pixels à fixer empiriquement
-                print("plante hors de portée")
-                #faire qqchose, comme par exemple s'éloigner de la plante en bougeant le robot
-
-            elif abs(self.aruco_pos.a_px.x-self.aruco_pos.b_px.x) >= 52: #seuil de pixels à fixer empiriquement                       
-                print("plante trop proche (ou erreur système)")
-                #faire qqchose, comme par exemple s'éloigner de la plante en bougeant le robot
-            else :
-                print("plante a portée de bras")
-                print(fax.AX_set_Pos('08', '0541', '1023', self.serial_asserv))
-                #attraperPlante(x_centreAruco,y_centreAruco)
-
+            if self.aruco_pos:    
+                #Actions
+                self.publishSelfPosition()
             rate.sleep() #wait according to publish rate
         
         #Close serial connection
